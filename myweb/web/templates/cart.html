@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h3 class="fw-bold mb-4 text-uppercase">Giỏ hàng của bạn</h3>
+
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="py-3 ps-4">Sản phẩm</th>
+                                <th class="py-3">Đơn giá</th>
+                                <th class="py-3">Số lượng</th>
+                                <th class="py-3">Thành tiền</th>
+                                <th class="py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        {% with first_img=item.SanPham.hinhanhs.first %}
+                                            {% if first_img %}
+                                                <img src="{% static first_img.Anh %}" width="60" height="60" class="rounded border me-3" style="object-fit: contain;">
+                                            {% else %}
+                                                <img src="https://placehold.co/60" width="60" class="rounded me-3">
+                                            {% endif %}
+                                        {% endwith %}
+                                        
+                                        <div>
+                                            <a href="{% url 'web:product_detail' item.SanPham.id %}" class="fw-bold text-dark text-decoration-none">
+                                                {{ item.SanPham.TenSanPham }}
+                                            </a>
+                                            <br>
+                                            <small class="text-muted">{{ item.SanPham.ThuongHieu }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if item.discount_percent > 0 %}
+                                        <span class="text-danger fw-bold">{{ item.price_display|floatformat:0 }}đ</span>
+                                        <br>
+                                        <span class="text-muted text-decoration-line-through small">{{ item.old_price|floatformat:0 }}đ</span>
+                                    {% else %}
+                                        {{ item.price_display|floatformat:0 }}đ
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="input-group input-group-sm" style="width: 80px;">
+                                        <input type="number" class="form-control text-center" value="{{ item.SoLuong }}" min="1">
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-danger">{{ item.tong_gia|floatformat:0 }}đ</td>
+                                <td>
+                                    <a href="{% url 'web:remove_from_cart' item.id %}" class="text-secondary" onclick="return confirm('Bạn có chắc muốn xóa?');">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mt-4 mt-md-0">
+            <div class="card border-0 shadow-sm bg-white">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Cộng giỏ hàng</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Tạm tính:</span>
+                        <span class="fw-bold">{{ tong_tien|floatformat:0 }}đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-4 border-top pt-3">
+                        <span class="fw-bold fs-5">Tổng cộng:</span>
+                        <span class="fw-bold fs-5 text-danger">{{ tong_tien|floatformat:0 }}đ</span>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'web:checkout' %}" class="btn btn-danger py-2 fw-bold">TIẾN HÀNH THANH TOÁN</a>
+                        <a href="{% url 'web:home' %}" class="btn btn-outline-secondary py-2">Tiếp tục mua hàng</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+        <div class="text-center py-5 bg-white rounded shadow-sm">
+            <img src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png" width="120" class="mb-4 opacity-50">
+            <h4>Giỏ hàng của bạn đang trống</h4>
+            <p class="text-muted">Hãy chọn thêm sản phẩm để mua sắm nhé</p>
+            <a href="{% url 'web:home' %}" class="btn btn-primary px-4 py-2 mt-2 rounded-pill">Mua sắm ngay</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

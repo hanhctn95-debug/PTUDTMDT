@@ -1,0 +1,45 @@
+{% load static %}
+
+<div class="card h-100 shadow-sm border-0 product-card hover-card">
+    
+    <a href="{% url 'web:product_detail' sp.id %}" class="product-image-link card-img-top"> 
+        {% with first_img=sp.hinhanhs.first %}
+            {% if first_img %}
+                <img src="{% static first_img.Anh %}" alt="{{ sp.TenSanPham }}" class="product-img">
+            {% else %}
+                <img src="https://placehold.co/200x200?text=No+Image" alt="Chưa có ảnh" class="product-img">
+            {% endif %}
+        {% endwith %}
+    </a>
+
+    <div class="card-body d-flex flex-column p-3">
+        <h6 class="card-title text-truncate-2" title="{{ sp.TenSanPham }}">
+            <a href="#" class="text-dark text-decoration-none">{{ sp.TenSanPham }}</a>
+        </h6>
+        
+        <div class="mt-auto">
+            {% with result=sp.get_discounted_price %}
+                {% if result.1 > 0 or result.2 > 0 %}
+                    <span class="text-danger fw-bold fs-5">{{ result.0|floatformat:0 }}đ</span>
+                    <br>
+                    <span class="text-muted text-decoration-line-through small">{{ sp.DonGia|floatformat:0 }}đ</span>
+                    
+                    {% if result.1 > 0 %}
+                        <span class="badge bg-danger ms-1">-{{ result.1|floatformat:0 }}%</span>
+                    {% endif %}
+                {% else %}
+                    <span class="text-danger fw-bold fs-5">{{ sp.DonGia|floatformat:0 }}đ</span>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+    
+    <div class="card-footer bg-white border-0 d-flex justify-content-between pb-3 pt-0">
+        <a href="{% url 'web:product_detail' sp.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+            Chi tiết
+        </a> 
+        <a href="{% url 'web:add_to_cart' sp.id %}" class="btn btn-primary btn-sm rounded-pill px-3">
+            <i class="fas fa-cart-plus"></i> Thêm
+        </a>
+    </div>
+</div>

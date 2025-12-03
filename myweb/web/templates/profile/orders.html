@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Style đồng bộ Sidebar */
+    .profile-sidebar .list-group-item {
+        border: none;
+        padding: 12px 20px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        transition: all 0.2s;
+    }
+    .profile-sidebar .list-group-item:hover {
+        background-color: #e9ecef;
+        color: #0d6efd;
+    }
+    .profile-sidebar .list-group-item.active {
+        background-color: #ff9800 !important;
+        border-color: #ff9800 !important;
+        color: white;
+    }
+    .avatar-circle {
+        width: 80px; height: 80px; background-color: #ff9800;
+        color: white; font-size: 32px; font-weight: bold;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;
+    }
+    
+    /* Style riêng cho bảng đơn hàng */
+    .table-orders thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        color: #495057;
+    }
+    .order-status {
+        font-size: 0.85rem;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+    <div class="row">
+        
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center pt-4 pb-3">
+                    <div class="avatar-circle">
+                        {{ user.TenKhachHang|slice:":1"|upper }}
+                    </div>
+                    <h6 class="fw-bold">Xin chào, {{ user.TenKhachHang }}</h6>
+                </div>
+                
+                <div class="list-group list-group-flush p-3 profile-sidebar">
+                    <a href="{% url 'web:profile_info' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user"></i> Thông tin tài khoản
+                    </a>
+                    <a href="{% url 'web:profile_membership' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-crown"></i> Chương trình thành viên
+                    </a>
+                    <a href="{% url 'web:profile_orders' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-clipboard-list"></i> Danh sách đơn hàng
+                    </a>
+                    <a href="{% url 'web:profile_addresses' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-map-marker-alt"></i> Sổ địa chỉ
+                    </a>
+                    <a href="{% url 'web:logout' %}" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h5 class="fw-bold text-uppercase text-primary">Lịch sử đơn hàng</h5>
+                </div>
+                
+                <div class="card-body p-4">
+                    {% if orders %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle table-orders">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Mã đơn</th>
+                                        <th scope="col">Ngày đặt</th>
+                                        <th scope="col">Tổng tiền</th>
+                                        <th scope="col">Trạng thái</th>
+                                        <th scope="col" class="text-center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td class="fw-bold text-primary">#{{ order.id }}</td>
+                                        <td>{{ order.NgayDat|date:"d/m/Y H:i" }}</td>
+                                        <td class="fw-bold text-danger">{{ order.TongTien|floatformat:0 }}đ</td>
+                                        
+                                        <td>
+                                            {% if "Đã giao" in order.TrangThaiGH %}
+                                                <span class="badge bg-success order-status">
+                                                    <i class="fas fa-check-circle"></i> {{ order.TrangThaiGH }}
+                                                </span>
+                                            {% elif "Hủy" in order.TrangThaiGH %}
+                                                <span class="badge bg-danger order-status">
+                                                    <i class="fas fa-times-circle"></i> {{ order.TrangThaiGH }}
+                                                </span>
+                                            {% elif "Đang giao" in order.TrangThaiGH %}
+                                                <span class="badge bg-info text-dark order-status">
+                                                    <i class="fas fa-truck"></i> {{ order.TrangThaiGH }}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark order-status">
+                                                    <i class="fas fa-clock"></i> {{ order.TrangThaiGH }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        
+                                        <td class="text-center">
+                                            <a href="{% url 'web:order_detail' order.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                                Xem chi tiết
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png" width="100" class="mb-3 opacity-50">
+                            <p class="text-muted">Bạn chưa có đơn hàng nào.</p>
+                            <a href="{% url 'web:home' %}" class="btn btn-primary rounded-pill px-4">
+                                Mua sắm ngay
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

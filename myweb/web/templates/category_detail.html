@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid px-5 mt-4 mb-5"> 
+    
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'web:home' %}">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ danh_muc.TenDanhMuc }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <aside class="col-lg-2 col-md-3"> 
+            <div class="card shadow-sm border-0 rounded-3">
+                 <div class="card-header bg-white border-bottom-0 pt-3">
+                    <h5 class="fw-bold m-0"><i class="fas fa-filter text-primary"></i> BỘ LỌC</h5>
+                 </div>
+                 
+                 <div class="card-body">
+                     <form method="GET" id="filterForm">
+                        
+                        <div class="filter-group mb-4">
+                            <h6 class="fw-bold text-uppercase" style="font-size: 0.9rem;">Thương hiệu</h6>
+                            <div style="max-height: 200px; overflow-y: auto;"> 
+                                {% for brand in all_brands %}
+                                <div class="form-check my-2">
+                                    <input class="form-check-input" type="checkbox" name="brand" 
+                                           value="{{ brand }}" id="brand_{{ forloop.counter }}"
+                                           {% if brand in selected_brands %}checked{% endif %}
+                                           onchange="this.form.submit()">
+                                    <label class="form-check-label" for="brand_{{ forloop.counter }}" style="cursor: pointer;">
+                                        {{ brand }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <hr class="text-muted">
+
+                        <div class="filter-group mb-3">
+                            <h6 class="fw-bold text-uppercase" style="font-size: 0.9rem;">Mức giá</h6>
+                            
+                            <div class="form-check my-2">
+                                <input class="form-check-input" type="radio" name="price" value="" id="price_all"
+                                       {% if not selected_price %}checked{% endif %} 
+                                       onchange="this.form.submit()">
+                                <label class="form-check-label" for="price_all">Tất cả</label>
+                            </div>
+
+                            <div class="form-check my-2">
+                                <input class="form-check-input" type="radio" name="price" value="under_100" id="p1"
+                                       {% if selected_price == 'under_100' %}checked{% endif %} 
+                                       onchange="this.form.submit()">
+                                <label class="form-check-label" for="p1">Dưới 100k</label>
+                            </div>
+
+                            <div class="form-check my-2">
+                                <input class="form-check-input" type="radio" name="price" value="100_300" id="p2"
+                                       {% if selected_price == '100_300' %}checked{% endif %} 
+                                       onchange="this.form.submit()">
+                                <label class="form-check-label" for="p2">100k - 300k</label>
+                            </div>
+                            <div class="form-check my-2">
+                                <input class="form-check-input" type="radio" name="price" value="300_500" id="p3"
+                                       {% if selected_price == '300_500' %}checked{% endif %} 
+                                       onchange="this.form.submit()">
+                                <label class="form-check-label" for="p3">300k - 500k</label>
+                            </div>
+
+                             <div class="form-check my-2">
+                                <input class="form-check-input" type="radio" name="price" value="above_500" id="p4"
+                                       {% if selected_price == 'above_500' %}checked{% endif %} 
+                                       onchange="this.form.submit()">
+                                <label class="form-check-label" for="p4">Trên 500k</label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-3">
+                            <a href="{% url 'web:category_detail' danh_muc.id %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-sync-alt"></i> Xóa bộ lọc
+                            </a>
+                        </div>
+
+                     </form>
+                 </div>
+             </div>
+        </aside>
+
+        <div class="col-lg-10 col-md-9"> 
+            <div class="category-banner mb-4 rounded-3 overflow-hidden shadow-sm">
+                <img src="{% static 'img/banner/bannerdanhmuc.png' %}" alt="Banner" class="w-100" style="height: 300px; object-fit: cover;">
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-uppercase fw-bold text-primary m-0">{{ danh_muc.TenDanhMuc }}</h4>
+                <span class="text-muted">Tìm thấy {{ products.count }} sản phẩm</span>
+            </div>
+
+            <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5">
+                {% for sp in products %}
+                <div class="col"> 
+                    {% include "includes/product_card.html" %}
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5 bg-light rounded">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Rất tiếc, không tìm thấy sản phẩm nào phù hợp với bộ lọc này.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,470 @@
+/* static/css/common.css */
+
+/* Định nghĩa màu sắc */
+:root {
+    --vpp-blue-dark: #00438c;  /* Xanh đậm cho Header top và Footer */
+    --vpp-blue-light: #007bff; /* Xanh nhạt cho Nav bar */
+    --vpp-text-dark: #333;
+    --vpp-red-sale: #dc3545;
+}
+
+/* Base & Container */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: white; 
+    color: var(--vpp-text-dark);
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- HEADER STYLES --- */
+header a {
+    text-decoration: none;
+    color: white;
+}
+
+.top-header {
+    background-color: var(--vpp-blue-dark);
+    padding: 10px 0;
+    color: white; /* Đặt màu chữ chung là TRẮNG */
+}
+
+.top-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo a {
+    font-size: 1.8em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    height: 35px;
+    margin-right: 5px;
+}
+
+/* Search Bar */
+.search-bar {
+    flex-grow: 1;
+    max-width: 500px;
+    margin: 0 30px;
+}
+
+.search-bar form {
+    display: flex;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: white;
+    border: 1px solid #ccc;
+}
+
+.search-bar input {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: none;
+    outline: none;
+    font-size: 1em;
+}
+
+.search-bar button {
+    background-color: white;
+    color: var(--vpp-text-dark);
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+
+/* Contact Info */
+.contact-info {
+    display: flex;
+    align-items: center;
+    gap: 25px; 
+    /* Dùng Flexbox để căn chỉnh icon và chữ */
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+    font-size: 0.9em;
+    color: white; /* Đảm bảo màu chữ mặc định là trắng */
+}
+
+.contact-item i {
+    font-size: 1.4em;
+    color: white; /* Màu ICON là TRẮNG */
+}
+
+/* Hotline Item */
+.hotline-item .hotline-text p {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1.1em;
+    line-height: 1.2;
+    color: #ffc107; /* Màu VÀNG/CAM nhạt để làm nổi bật số Hotline */
+}
+
+.contact-hotline p {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+.contact-hotline span {
+    font-size: 0.8em;
+    opacity: 0.8;
+}
+.user-actions {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
+
+/* User Item & Cart Item Links */
+.user-text a, .cart-item a {
+    color: white; /* Đảm bảo các liên kết là màu TRẮNG */
+    font-size: 0.9em;
+}
+
+.user-text a:first-child {
+    font-weight: bold;
+}
+
+/* Main Navigation Bar */
+.main-nav-bar {
+    background-color: var(--vpp-blue-light);
+    border-bottom: 2px solid #0056b3;
+}
+
+.main-nav-bar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+    gap: 30px;
+}
+
+.main-nav-bar li a {
+    display: block;
+    color: white;
+    padding: 15px 10px;
+    font-weight: 500;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+    white-space: nowrap; 
+}
+
+.main-nav-bar li a:hover {
+    background-color: var(--vpp-blue-dark);
+}
+
+/* --- MAIN CONTENT --- */
+main {
+    padding-top: 20px;
+}
+
+/* CAROUSEL */
+.main-carousel-section {
+    margin-bottom: 30px;
+}
+.main-banner-img {
+    border-radius: 8px; 
+    width: 100%;
+    height: auto;
+}
+
+/* PRODUCT HIGHLIGHT */
+.section-title {
+    color: var(--vpp-blue-dark);
+    text-align: center;
+    margin: 40px 0 20px;
+    border-bottom: 3px solid var(--vpp-red-sale);
+    display: inline-block;
+    padding-bottom: 5px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.8em;
+    font-weight: 600;
+}
+
+/* --- PRODUCT GRID STYLES (Giống Thiên Long) --- */
+
+.product-grid {
+    padding: 30px 0;
+}
+
+.product-grid .section-title {
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 1.8em;
+    color: var(--vpp-blue-dark);
+    position: relative;
+    padding-bottom: 10px;
+}
+.product-grid .section-title::after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 3px;
+    background-color: var(--vpp-red-sale);
+    margin: 5px auto 0;
+}
+
+/* Product Card Styles */
+.product-card {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 20px;
+    transition: box-shadow 0.3s, border-color 0.3s;
+    overflow: hidden;
+    height: 100%; /* Đảm bảo các thẻ có chiều cao bằng nhau trong cùng hàng */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.product-card {
+    transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.hover-card:hover {
+    transform: translateY(-5px); /* Nhấc lên 5px */
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; /* Đổ bóng đậm hơn */
+}
+.product-image-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px; /* Chiều cao cố định */
+    overflow: hidden;
+    padding: 10px;
+}
+
+.product-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+/* Trong file common.css */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    
+    /* Thêm dòng này vào để VS Code hết báo lỗi */
+    line-clamp: 2; 
+    
+    height: 2.8em;
+    line-height: 1.4em;
+    margin-bottom: 5px;
+}
+
+/* Product Info */
+.product-info {
+    flex-grow: 1; /* Cho phép vùng thông tin mở rộng */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Căn trên nếu có khoảng trống */
+    padding: 5px 0;
+}
+
+.product-title {
+    font-size: 0.9em;
+    font-weight: 500;
+    color: #333;
+    text-decoration: none;
+    line-height: 1.3;
+    display: block;
+    overflow: hidden;
+    max-height: 36px; /* Giới hạn 2 dòng */
+    margin-bottom: 5px;
+}
+.product-title:hover {
+    color: var(--vpp-red-sale);
+}
+
+.product-price {
+    display: block;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--vpp-red-sale); 
+    margin-top: 5px;
+}
+
+/* Product Actions (Buttons/Links) */
+.product-actions {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+/* Chi tiết Button Style */
+.product-actions .btn-detail {
+    text-decoration: none;
+    padding: 8px 10px;
+    background-color: white;
+    border: 1px solid var(--vpp-blue-light);
+    color: var(--vpp-blue-light);
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: 600;
+    flex-grow: 1;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.product-actions .btn-detail:hover {
+    background-color: var(--vpp-blue-light);
+    color: white;
+}
+
+/* Thêm vào giỏ Button Style (Thêm) */
+.product-actions .btn-add-to-cart {
+    padding: 8px 10px;
+    background-color: var(--vpp-red-sale);
+    border: none;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: 600;
+    flex-grow: 1;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.product-actions .btn-add-to-cart:hover {
+    background-color: #c82333; /* Màu đỏ đậm hơn khi hover */
+}
+.btn-add-cart {
+    background-color: var(--vpp-blue-dark);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* Sub Banner Footer Top */
+.sub-banner-section {
+    background: linear-gradient(90deg, #375aab, var(--vpp-blue-dark));
+    color: white;
+    padding: 15px 0;
+    margin-top: 30px;
+}
+.sub-banner-text {
+    font-size: 1.8em;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+
+/* --- FOOTER STYLES --- */
+footer {
+    background-color: var(--vpp-blue-dark);
+    color: white;
+    padding-top: 0;
+    font-size: 0.9em;
+}
+
+.footer-main {
+    padding-bottom: 30px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2.5fr 1.5fr 2fr 2fr; /* Chia 4 cột */
+    gap: 30px;
+}
+
+.footer-col h4 {
+    color: white;
+    font-size: 1.1em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-weight: 500;
+    padding-top: 15px;
+}
+
+.list-footer li {
+    text-align: left;
+}
+
+.list-footer li a{
+
+    color: white;
+}
+
+footer img{
+    padding: 15px;
+}
+
+/* --- STAR RATING CSS --- */
+.rate {
+    float: left;
+    height: 46px;
+    padding: 0 10px;
+}
+/* Tìm đoạn này trong common.css */
+.rate:not(:checked) > input {
+    position: absolute;
+    /* top: -9999px;  <-- XÓA HOẶC COMMENT DÒNG NÀY ĐI */
+    
+    /* THÊM 3 DÒNG NÀY VÀO: */
+    opacity: 0;           /* Làm trong suốt để không nhìn thấy */
+    pointer-events: none; /* Để chuột click xuyên qua nó, không bị vướng */
+    z-index: -1;          /* Cho nằm chìm xuống dưới */
+}
+.rate:not(:checked) > label {
+    float:right;
+    width:1em;
+    overflow:hidden;
+    white-space:nowrap;
+    cursor:pointer;
+    font-size:30px;
+    color:#ccc;
+}
+.rate:not(:checked) > label:before {
+    content: '★ ';
+}
+.rate > input:checked ~ label {
+    color: #ffc700;    
+}
+.rate:not(:checked) > label:hover,
+.rate:not(:checked) > label:hover ~ label {
+    color: #deb217;  
+}
+.rate > input:checked + label:hover,
+.rate > input:checked + label:hover ~ label,
+.rate > input:checked ~ label:hover,
+.rate > input:checked ~ label:hover ~ label,
+.rate > label:hover ~ input:checked ~ label {
+    color: #c59b08;
+}
+/* ... các style footer còn lại ... */

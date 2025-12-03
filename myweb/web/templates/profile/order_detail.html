@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* CSS Sidebar đồng bộ */
+    .profile-sidebar .list-group-item { border: none; padding: 12px 20px; font-weight: 500; color: #333; margin-bottom: 5px; border-radius: 5px; transition: all 0.2s; }
+    .profile-sidebar .list-group-item:hover { background-color: #e9ecef; color: #0d6efd; }
+    .profile-sidebar .list-group-item.active { background-color: #ff9800 !important; border-color: #ff9800 !important; color: white; }
+    .avatar-circle { width: 80px; height: 80px; background-color: #ff9800; color: white; font-size: 32px; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+    
+    /* CSS riêng cho chi tiết đơn */
+    .order-status-badge { font-size: 0.9rem; padding: 8px 15px; border-radius: 20px; }
+    .step-item { position: relative; z-index: 1; }
+    .table-detail th { background-color: #f8f9fa; color: #6c757d; font-weight: 600; }
+</style>
+
+<div class="container mt-4 mb-5">
+    <div class="row">
+        
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center pt-4 pb-3">
+                    <div class="avatar-circle">{{ user.TenKhachHang|slice:":1"|upper }}</div>
+                    <h6 class="fw-bold">Xin chào, {{ user.TenKhachHang }}</h6>
+                </div>
+                <div class="list-group list-group-flush p-3 profile-sidebar">
+                    <a href="{% url 'web:profile_info' %}" class="list-group-item list-group-item-action"><i class="fas fa-user"></i> Thông tin tài khoản</a>
+                    <a href="{% url 'web:profile_membership' %}" class="list-group-item list-group-item-action"><i class="fas fa-crown"></i> Chương trình thành viên</a>
+                    <a href="{% url 'web:profile_orders' %}" class="list-group-item list-group-item-action active"><i class="fas fa-clipboard-list"></i> Danh sách đơn hàng</a>
+                    <a href="{% url 'web:profile_addresses' %}" class="list-group-item list-group-item-action"><i class="fas fa-map-marker-alt"></i> Sổ địa chỉ</a>
+                    <a href="{% url 'web:logout' %}" class="list-group-item list-group-item-action text-danger"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="mb-3">
+                <a href="{% url 'web:profile_orders' %}" class="text-decoration-none text-muted">
+                    <i class="fas fa-arrow-left"></i> Quay lại danh sách đơn hàng
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold text-uppercase m-0">Chi tiết đơn hàng #{{ order.id }}</h5>
+                        <small class="text-muted">Ngày đặt: {{ order.NgayDat|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    
+                    {% if "Đã giao" in order.TrangThaiGH %}
+                        <span class="badge bg-success order-status-badge"><i class="fas fa-check-circle"></i> {{ order.TrangThaiGH }}</span>
+                    {% elif "Hủy" in order.TrangThaiGH %}
+                        <span class="badge bg-danger order-status-badge"><i class="fas fa-times-circle"></i> {{ order.TrangThaiGH }}</span>
+                    {% elif "Đang giao" in order.TrangThaiGH %}
+                        <span class="badge bg-info text-dark order-status-badge"><i class="fas fa-truck"></i> {{ order.TrangThaiGH }}</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark order-status-badge"><i class="fas fa-clock"></i> {{ order.TrangThaiGH }}</span>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body p-4">
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-primary">Địa chỉ nhận hàng</h6>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-1"><strong>{{ order.TaiKhoan.TenKhachHang }}</strong></p>
+                                <p class="mb-1 text-muted">{{ order.DiaChi.SDTLienHe }}</p>
+                                <p class="mb-0 text-muted small">
+                                    {{ order.DiaChi.ChiTietDiaChi }}, {{ order.DiaChi.Phuong_Xa }}, {{ order.DiaChi.Tinh_Thanh_Pho }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <h6 class="fw-bold text-primary">Phương thức thanh toán</h6>
+                            <div class="bg-light p-3 rounded h-100">
+                                <p class="mb-0">{{ order.ThanhToan.TenPTTT }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-primary mb-3">Sản phẩm đã mua</h6>
+                    <div class="table-responsive">
+                        <table class="table table-detail align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-center">SL</th>
+                                    <th class="text-end">Tạm tính</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% with first_img=item.SanPham.hinhanhs.first %}
+                                                {% if first_img %}
+                                                    <img src="{% static first_img.Anh %}" width="50" height="50" class="rounded border me-2" style="object-fit: contain;">
+                                                {% else %}
+                                                    <img src="https://placehold.co/50" class="rounded border me-2">
+                                                {% endif %}
+                                            {% endwith %}
+                                            <div>
+                                                <a href="{% url 'web:product_detail' item.SanPham.id %}" class="text-dark text-decoration-none fw-bold small">
+                                                    {{ item.SanPham.TenSanPham }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">{{ item.DonGiaTaiThoiDiemMua|floatformat:0 }}đ</td>
+                                    <td class="text-center">{{ item.SoLuong }}</td>
+                                    
+                                    <td class="text-end fw-bold">
+                                        {{ item.thanh_tien_item|floatformat:0 }}đ
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="border-top">
+                                <tr>
+                                    <td colspan="3" class="text-end pt-3">Tạm tính:</td>
+                                    <td class="text-end pt-3 text-dark">
+                                        {{ subtotal|floatformat:0 }}đ
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="3" class="text-end border-0">Phí vận chuyển:</td>
+                                    <td class="text-end border-0 text-dark">
+                                        {{ shipping_fee|floatformat:0 }}đ
+                                    </td>
+                                </tr>
+                                
+                                {% if discount_amount > 0 %}
+                                <tr>
+                                    <td colspan="3" class="text-end border-0">
+                                        <span class="text-success"><i class="fas fa-tag"></i> Giảm giá (Voucher):</span>
+                                    </td>
+                                    <td class="text-end border-0 text-success fw-bold">
+                                        -{{ discount_amount|floatformat:0 }}đ
+                                    </td>
+                                </tr>
+                                {% endif %}
+
+                                <tr>
+                                    <td colspan="3" class="text-end border-0 fs-5 fw-bold">Tổng cộng:</td>
+                                    <td class="text-end border-0 fs-5 fw-bold text-danger">
+                                        {{ order.TongTien|floatformat:0 }}đ
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

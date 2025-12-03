@@ -1,0 +1,23 @@
+/* --- Tinh chỉnh Carousel (Ví dụ) --- */
+/* (Phần lớn style Carousel đã được Bootstrap và common.css xử lý) */
+
+/* Định dạng cho các nút điều khiển Carousel */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5); /* Tạo nền tối cho nút để dễ nhìn */
+    border-radius: 50%;
+    padding: 20px;
+}
+
+/* Định dạng banner phụ (VPP SHOP ĐỘC QUYỀN) */
+.sub-banner-section {
+    padding: 30px 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.sub-banner-text {
+    /* Đảm bảo chữ to và nổi bật trên banner phụ */
+    font-size: 2.5em; 
+    letter-spacing: 2px;
+}
+

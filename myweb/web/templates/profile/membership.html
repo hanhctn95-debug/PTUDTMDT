@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* COPY STYLE TỪ TRANG INFO SANG ĐỂ ĐỒNG BỘ */
+    .profile-sidebar .list-group-item {
+        border: none;
+        padding: 12px 20px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        transition: all 0.2s;
+    }
+    .profile-sidebar .list-group-item i {
+        width: 25px;
+    }
+    .profile-sidebar .list-group-item:hover {
+        background-color: #e9ecef;
+        color: #0d6efd;
+    }
+    .profile-sidebar .list-group-item.active {
+        background-color: #ff9800 !important; /* Dùng !important để đè màu xanh mặc định */
+        border-color: #ff9800 !important;
+        color: white;
+    }
+    .avatar-circle {
+        width: 80px;
+        height: 80px;
+        background-color: #ff9800;
+        color: white;
+        font-size: 32px;
+        font-weight: bold;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+    }
+
+    /* CSS RIÊNG CHO PHẦN RANK */
+    .rank-icon-lg {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        margin-bottom: 20px;
+    }
+    .info-row {
+        padding: 12px 0;
+        border-bottom: 1px dashed #eee;
+        display: flex;
+        justify-content: space-between;
+    }
+    .info-row:last-child {
+        border-bottom: none;
+    }
+</style>
+
+<div class="container mt-4 mb-5">
+    <div class="row">
+        
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center pt-4 pb-3">
+                    <div class="avatar-circle">
+                        {{ user.TenKhachHang|slice:":1"|upper }}
+                    </div>
+                    <h6 class="fw-bold">Xin chào, {{ user.TenKhachHang }}</h6>
+                </div>
+                
+                <div class="list-group list-group-flush p-3 profile-sidebar">
+                    <a href="{% url 'web:profile_info' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user"></i> Thông tin tài khoản
+                    </a>
+                    <a href="{% url 'web:profile_membership' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-crown"></i> Chương trình thành viên
+                    </a>
+                    <a href="{% url 'web:profile_orders' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-clipboard-list"></i> Danh sách đơn hàng
+                    </a>
+                    <a href="{% url 'web:profile_addresses' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-map-marker-alt"></i> Sổ địa chỉ
+                    </a>
+                    <a href="{% url 'web:logout' %}" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h5 class="fw-bold text-uppercase text-primary">Hạng thành viên</h5>
+                </div>
+
+                <div class="card-body p-4 text-center">
+                    
+                    {% if hang_hien_tai == 'Silver' %}
+                        <img src="https://cdn-icons-png.flaticon.com/512/179/179251.png" class="rank-icon-lg" alt="Silver">
+                    {% elif hang_hien_tai == 'Gold' %}
+                        <img src="https://cdn-icons-png.flaticon.com/512/179/179249.png" class="rank-icon-lg" alt="Gold">
+                    {% elif hang_hien_tai == 'Platinum' %}
+                        <img src="https://cdn-icons-png.flaticon.com/512/179/179250.png" class="rank-icon-lg" alt="Platinum">
+                    {% elif hang_hien_tai == 'Diamond' %}
+                        <img src="https://cdn-icons-png.flaticon.com/512/179/179247.png" class="rank-icon-lg" alt="Diamond">
+                    {% else %}
+                        <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" class="rank-icon-lg" alt="New">
+                    {% endif %}
+
+                    <div class="mt-2 text-start mx-auto p-3 bg-light rounded" style="max-width: 600px;">
+                        
+                        <div class="info-row">
+                            <span class="text-muted">Tổng chi tiêu tích lũy:</span>
+                            <span class="fw-bold text-danger fs-5">{{ tong_tien|floatformat:0 }}đ</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span class="text-muted">Hạng thành viên hiện tại:</span>
+                            <span class="fw-bold text-uppercase" style="color: #ff9800;">{{ hang_hien_tai }}</span>
+                        </div>
+
+                        {% if hang_tiep_theo != 'Max Level' %}
+                            <div class="info-row border-0">
+                                <span class="text-muted">Hạng tiếp theo:</span>
+                                <span class="fw-bold text-primary">{{ hang_tiep_theo }}</span>
+                            </div>
+                            
+                            <div class="alert alert-info mt-3 d-flex align-items-center">
+                                <i class="fas fa-info-circle me-2 fs-4"></i>
+                                <div>
+                                    Bạn cần chi tiêu thêm <strong class="text-danger fs-5">{{ tien_len_hang|floatformat:0 }}đ</strong> 
+                                    nữa để thăng hạng <strong>{{ hang_tiep_theo }}</strong>.
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success mt-3 text-center">
+                                <i class="fas fa-trophy text-warning"></i> Chúc mừng! Bạn đã đạt hạng cao nhất <strong>Diamond</strong>.
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="mt-5">
+                        <h6 class="fw-bold mb-3 text-uppercase text-muted" style="font-size: 0.9rem;">Chi tiết các hạng</h6>
+                        <div class="d-flex justify-content-center flex-wrap gap-2">
+                            <div class="p-2 border rounded text-center" style="min-width: 100px;">
+                                <div class="fw-bold text-secondary">Silver</div>
+                                <small style="font-size: 0.75rem;">> 1 Triệu</small>
+                            </div>
+                            <div class="p-2 border rounded text-center" style="min-width: 100px; background-color: #fff3cd;">
+                                <div class="fw-bold text-warning">Gold</div>
+                                <small style="font-size: 0.75rem;">> 3 Triệu</small>
+                            </div>
+                            <div class="p-2 border rounded text-center" style="min-width: 100px; background-color: #e2e3e5;">
+                                <div class="fw-bold text-dark">Platinum</div>
+                                <small style="font-size: 0.75rem;">> 7 Triệu</small>
+                            </div>
+                            <div class="p-2 border rounded text-center" style="min-width: 100px; background-color: #cff4fc;">
+                                <div class="fw-bold text-info">Diamond</div>
+                                <small style="font-size: 0.75rem;">> 10 Triệu</small>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
