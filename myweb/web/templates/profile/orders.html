@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
+{% load price_filters %}
 
 {% block content %}
 <style>
@@ -98,26 +100,30 @@
                                     <tr>
                                         <td class="fw-bold text-primary">#{{ order.id }}</td>
                                         <td>{{ order.NgayDat|date:"d/m/Y H:i" }}</td>
-                                        <td class="fw-bold text-danger">{{ order.TongTien|floatformat:0 }}đ</td>
+                                        <td class="fw-bold text-danger">{{ order.TongTien|format_price }}</td>
                                         
                                         <td>
-                                            {% if "Đã giao" in order.TrangThaiGH %}
-                                                <span class="badge bg-success order-status">
-                                                    <i class="fas fa-check-circle"></i> {{ order.TrangThaiGH }}
-                                                </span>
-                                            {% elif "Hủy" in order.TrangThaiGH %}
-                                                <span class="badge bg-danger order-status">
-                                                    <i class="fas fa-times-circle"></i> {{ order.TrangThaiGH }}
-                                                </span>
-                                            {% elif "Đang giao" in order.TrangThaiGH %}
-                                                <span class="badge bg-info text-dark order-status">
-                                                    <i class="fas fa-truck"></i> {{ order.TrangThaiGH }}
-                                                </span>
-                                            {% else %}
-                                                <span class="badge bg-warning text-dark order-status">
-                                                    <i class="fas fa-clock"></i> {{ order.TrangThaiGH }}
-                                                </span>
-                                            {% endif %}
+                                                        {% if "Đã giao" in order.trangThaiGH %}
+                                                            <span class="badge bg-success order-status">
+                                                                <i class="fas fa-check-circle"></i> {{ order.trangThaiGH }}
+                                                            </span>
+                                                        {% elif "Đã hủy" in order.trangThaiGH %}
+                                                            <span class="badge bg-danger order-status">
+                                                                <i class="fas fa-times-circle"></i> {{ order.trangThaiGH }}
+                                                            </span>
+                                                        {% elif "Đang giao" in order.trangThaiGH %}
+                                                            <span class="badge bg-info text-dark order-status">
+                                                                <i class="fas fa-truck"></i> {{ order.trangThaiGH }}
+                                                            </span>
+                                                        {% elif "Đã xác nhận" in order.trangThaiGH %}
+                                                            <span class="badge bg-primary order-status">
+                                                                <i class="fas fa-check"></i> {{ order.trangThaiGH }}
+                                                            </span>
+                                                        {% else %}
+                                                            <span class="badge bg-warning text-dark order-status">
+                                                                <i class="fas fa-clock"></i> {{ order.trangThaiGH }}
+                                                            </span>
+                                                        {% endif %}
                                         </td>
                                         
                                         <td class="text-center">

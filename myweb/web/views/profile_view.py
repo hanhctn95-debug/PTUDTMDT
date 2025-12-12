@@ -52,7 +52,7 @@ def membership(request):
     # 2. Tính tổng tiền (Chỉ tính đơn đã giao)
     tong_tien = DonHang.objects.filter(
         TaiKhoan=khach_hang, 
-        TrangThaiGH='Đã giao hàng' 
+        trangThaiGH='Đã giao' 
     ).aggregate(Sum('TongTien'))['TongTien__sum'] or 0
     
     # 3. Logic xác định hạng và TIỀN CẦN MUA THÊM

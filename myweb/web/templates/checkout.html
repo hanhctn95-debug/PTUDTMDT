@@ -1,4 +1,6 @@
 {% load static %}
+{% load humanize %}
+{% load price_filters %}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -111,7 +113,7 @@
                         {% endif %}
                     {% endwith %}
                 </div>
-                <span class="badge rounded-pill bg-secondary position-absolute top-0 start-100 translate-middle shadow-sm" style="font-size: 0.75rem;">{{ item.SoLuong }}</span>
+                <span class="badge rounded-pill bg-secondary position-absolute top-0 end-0 shadow-sm" style="font-size: 0.75rem;">{{ item.SoLuong }}</span>
             </div>
             
             <div class="ms-3 flex-grow-1 pe-2">
@@ -120,11 +122,7 @@
             </div>
             
             <div class="fw-bold small text-nowrap">
-                {% if item.tong_gia_item %}
-                    {{ item.tong_gia_item|floatformat:0 }}₫
-                {% else %}
-                    {% widthratio item.SanPham.DonGia 1 item.SoLuong %}₫
-                {% endif %}
+                {{ item.tong_gia_item|format_price }}
             </div>
         </div>
         {% endfor %}
@@ -139,19 +137,19 @@
         <div class="totals">
             <div class="d-flex justify-content-between mb-2 text-muted">
                 <span>Tạm tính</span>
-                <span id="subTotal" data-value="{{ tam_tinh }}">{{ tam_tinh|floatformat:0 }}₫</span>
+                <span id="subTotal" data-value="{{ tam_tinh }}">{{ tam_tinh|format_price }}</span>
             </div>
             <div class="d-flex justify-content-between mb-2 text-muted">
                 <span>Phí vận chuyển</span>
-                <span>{{ phi_van_chuyen|floatformat:0 }}₫</span>
+                <span>{{ phi_van_chuyen|format_price }}</span>
             </div>
             <div class="d-flex justify-content-between mb-2 text-success fw-bold" id="discountRow" style="display: none;">
                 <span>Giảm giá</span>
-                <span id="discountAmount">-0₫</span>
+                <span id="discountAmount">-0 đ</span>
             </div>
             <div class="d-flex justify-content-between mt-3 pt-3 border-top align-items-center">
                 <span class="fs-5">Tổng cộng</span>
-                <span class="fs-4 fw-bold text-primary" id="grandTotal">{{ tong_cong|floatformat:0 }}₫</span>
+                <span class="fs-4 fw-bold text-primary" id="grandTotal">{{ tong_cong|format_price }}</span>
             </div>
             
             <input type="hidden" name="final_total" id="finalTotalInput" value="{{ tong_cong }}">
@@ -189,19 +187,19 @@
                     var discount = (data.type === 'PERCENT') ? subTotal * (data.value / 100) : data.value;
                     
                     document.getElementById('discountRow').style.display = 'flex';
-                    document.getElementById('discountAmount').innerText = '-' + discount.toLocaleString() + '₫';
+                    document.getElementById('discountAmount').innerText = '-' + discount.toLocaleString('vi-VN') + ' đ';
                     
                     var oldTotal = parseFloat("{{ tong_cong }}");
                     var newTotal = oldTotal - discount;
                     if (newTotal < 0) newTotal = 0;
 
-                    document.getElementById('grandTotal').innerText = newTotal.toLocaleString() + '₫';
+                    document.getElementById('grandTotal').innerText = newTotal.toLocaleString('vi-VN') + ' đ';
                     document.getElementById('finalTotalInput').value = newTotal;
                     document.getElementById('couponInput').value = code;
                 } else {
                     messageBox.innerHTML = `<span class="text-danger"><i class="fas fa-times"></i> ${data.message}</span>`;
                     document.getElementById('discountRow').style.display = 'none';
-                    document.getElementById('grandTotal').innerText = "{{ tong_cong|floatformat:0 }}₫";
+                    document.getElementById('grandTotal').innerText = "{{ tong_cong|format_price }}";
                     document.getElementById('couponInput').value = "";
                 }
             })

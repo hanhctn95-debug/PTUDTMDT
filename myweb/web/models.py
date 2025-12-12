@@ -306,21 +306,23 @@ class DonHang(models.Model):
     DiaChi = models.ForeignKey(DiaChi, on_delete=models.PROTECT, verbose_name="Địa chỉ giao hàng")
     
     NgayDat = models.DateTimeField(auto_now_add=True)
-    TRANG_THAI_CHOICES = [
+    TRANG_THAI_DON_HANG = [
         ('Chờ xử lý', 'Chờ xử lý'),
-        ('Đang giao', 'Đang giao'), # Đã đổi thành 'Đang giao' theo ý bạn
+        ('Đã xác nhận', 'Đã xác nhận'),
+        ('Đang giao', 'Đang giao'),
         ('Đã giao', 'Đã giao'),
-        ('Hủy', 'Hủy'),
+        ('Đã hủy', 'Đã hủy'),
     ]
 
     # 2. Thêm choices vào trường này
-    TrangThaiGH = models.CharField(
+    trangThaiGH = models.CharField(
         max_length=50, 
-        choices=TRANG_THAI_CHOICES, # <--- QUAN TRỌNG
+        choices=TRANG_THAI_DON_HANG, # <--- QUAN TRỌNG
         default='Chờ xử lý',        # Mặc định khi mới đặt
         verbose_name="Trạng thái"
     )
     TongTien = models.DecimalField(max_digits=15, decimal_places=2)
+    lyDoHuy = models.TextField(blank=True, null=True, verbose_name="Lý do hủy")
 
     class Meta:
         ordering = ('-NgayDat',)

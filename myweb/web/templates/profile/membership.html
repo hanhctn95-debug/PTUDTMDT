@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
+{% load price_filters %}
 
 {% block content %}
 <style>
@@ -113,7 +115,7 @@
                         
                         <div class="info-row">
                             <span class="text-muted">Tổng chi tiêu tích lũy:</span>
-                            <span class="fw-bold text-danger fs-5">{{ tong_tien|floatformat:0 }}đ</span>
+                            <span class="fw-bold text-danger fs-5">{{ tong_tien|format_price }}</span>
                         </div>
 
                         <div class="info-row">
@@ -130,7 +132,7 @@
                             <div class="alert alert-info mt-3 d-flex align-items-center">
                                 <i class="fas fa-info-circle me-2 fs-4"></i>
                                 <div>
-                                    Bạn cần chi tiêu thêm <strong class="text-danger fs-5">{{ tien_len_hang|floatformat:0 }}đ</strong> 
+                                    Bạn cần chi tiêu thêm <strong class="text-danger fs-5">{{ tien_len_hang|format_price }}</strong> 
                                     nữa để thăng hạng <strong>{{ hang_tiep_theo }}</strong>.
                                 </div>
                             </div>

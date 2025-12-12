@@ -111,7 +111,7 @@ def checkout(request):
                 ThanhToan=thanh_toan,
                 DiaChi=dia_chi_giao,
                 TongTien=final_money_to_save, 
-                TrangThaiGH='Chờ xử lý',
+                trangThaiGH='Chờ xử lý',
                 GiamGia=obj_giam_gia
             )
 

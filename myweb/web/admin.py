@@ -91,12 +91,9 @@ class ChiTietDonHangInline(admin.TabularInline):
 
 @admin.register(DonHang)
 class DonHangAdmin(admin.ModelAdmin):
-    list_display = ('id', 'TaiKhoan', 'TongTien', 'TrangThaiGH', 'NgayDat')
-    list_filter = ('TrangThaiGH', 'NgayDat')
+    list_display = ('id', 'TaiKhoan', 'TongTien', 'trangThaiGH', 'NgayDat')
+    list_filter = ('trangThaiGH', 'NgayDat')
     search_fields = ('id', 'TaiKhoan__TenKhachHang')
-    
-    # Cho phép sửa trạng thái nhanh ngay bên ngoài danh sách (như bạn yêu cầu lúc nãy)
-    list_editable = ('TrangThaiGH',) 
     
     inlines = [ChiTietDonHangInline] # Quản lý chi tiết đơn hàng ngay trong Đơn hàng
 

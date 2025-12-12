@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.utils import timezone
 # Dấu .. nghĩa là thoát ra khỏi thư mục views để tìm file models.py ở thư mục cha
 from ..models import SanPham 
 
@@ -6,8 +7,13 @@ def index(request):
     # 1. Lấy từ khóa người dùng gửi lên (mặc định là rỗng nếu không có)
     query = request.GET.get('q', '')
 
-    # 2. Khởi tạo danh sách sản phẩm gốc (Mới nhất lên đầu)
-    san_pham = SanPham.objects.all().prefetch_related('hinhanhs').order_by('-id')
+    # 2. Lấy các sản phẩm có khuyến mãi đang hoạt động
+    now = timezone.now()
+    san_pham = SanPham.objects.filter(
+        khuyen_mai__NgayBatDau__lte=now,
+        khuyen_mai__NgayKetThuc__gte=now
+    ).distinct().prefetch_related('hinhanhs').order_by('-id')
+
 
     # 3. Nếu có từ khóa tìm kiếm -> Lọc danh sách
     if query:

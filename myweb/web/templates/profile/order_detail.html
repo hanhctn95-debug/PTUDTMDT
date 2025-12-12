@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
+{% load price_filters %}
 
 {% block content %}
 <style>
@@ -48,15 +50,17 @@
                         <small class="text-muted">Ngày đặt: {{ order.NgayDat|date:"d/m/Y H:i" }}</small>
                     </div>
                     
-                    {% if "Đã giao" in order.TrangThaiGH %}
-                        <span class="badge bg-success order-status-badge"><i class="fas fa-check-circle"></i> {{ order.TrangThaiGH }}</span>
-                    {% elif "Hủy" in order.TrangThaiGH %}
-                        <span class="badge bg-danger order-status-badge"><i class="fas fa-times-circle"></i> {{ order.TrangThaiGH }}</span>
-                    {% elif "Đang giao" in order.TrangThaiGH %}
-                        <span class="badge bg-info text-dark order-status-badge"><i class="fas fa-truck"></i> {{ order.TrangThaiGH }}</span>
-                    {% else %}
-                        <span class="badge bg-warning text-dark order-status-badge"><i class="fas fa-clock"></i> {{ order.TrangThaiGH }}</span>
-                    {% endif %}
+                                {% if "Đã giao" in order.trangThaiGH %}
+                                    <span class="badge bg-success order-status-badge"><i class="fas fa-check-circle"></i> {{ order.trangThaiGH }}</span>
+                                {% elif "Đã hủy" in order.trangThaiGH %}
+                                    <span class="badge bg-danger order-status-badge"><i class="fas fa-times-circle"></i> {{ order.trangThaiGH }}</span>
+                                {% elif "Đang giao" in order.trangThaiGH %}
+                                    <span class="badge bg-info text-dark order-status-badge"><i class="fas fa-truck"></i> {{ order.trangThaiGH }}</span>
+                                {% elif "Đã xác nhận" in order.trangThaiGH %}
+                                    <span class="badge bg-primary order-status-badge"><i class="fas fa-check"></i> {{ order.trangThaiGH }}</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark order-status-badge"><i class="fas fa-clock"></i> {{ order.trangThaiGH }}</span>
+                                {% endif %}
                 </div>
                 
                 <div class="card-body p-4">
@@ -110,11 +114,11 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="text-end">{{ item.DonGiaTaiThoiDiemMua|floatformat:0 }}đ</td>
+                                    <td class="text-end">{{ item.DonGiaTaiThoiDiemMua|format_price }}</td>
                                     <td class="text-center">{{ item.SoLuong }}</td>
                                     
                                     <td class="text-end fw-bold">
-                                        {{ item.thanh_tien_item|floatformat:0 }}đ
+                                        {{ item.thanh_tien_item|format_price }}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -123,14 +127,14 @@
                                 <tr>
                                     <td colspan="3" class="text-end pt-3">Tạm tính:</td>
                                     <td class="text-end pt-3 text-dark">
-                                        {{ subtotal|floatformat:0 }}đ
+                                        {{ subtotal|format_price }}
                                     </td>
                                 </tr>
 
                                 <tr>
                                     <td colspan="3" class="text-end border-0">Phí vận chuyển:</td>
                                     <td class="text-end border-0 text-dark">
-                                        {{ shipping_fee|floatformat:0 }}đ
+                                        {{ shipping_fee|format_price }}
                                     </td>
                                 </tr>
                                 
@@ -140,7 +144,7 @@
                                         <span class="text-success"><i class="fas fa-tag"></i> Giảm giá (Voucher):</span>
                                     </td>
                                     <td class="text-end border-0 text-success fw-bold">
-                                        -{{ discount_amount|floatformat:0 }}đ
+                                        -{{ discount_amount|format_price }}
                                     </td>
                                 </tr>
                                 {% endif %}
@@ -148,7 +152,7 @@
                                 <tr>
                                     <td colspan="3" class="text-end border-0 fs-5 fw-bold">Tổng cộng:</td>
                                     <td class="text-end border-0 fs-5 fw-bold text-danger">
-                                        {{ order.TongTien|floatformat:0 }}đ
+                                        {{ order.TongTien|format_price }}
                                     </td>
                                 </tr>
                             </tfoot>
