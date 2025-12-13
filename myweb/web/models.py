@@ -240,7 +240,7 @@ class SanPham_ThuocTinh(models.Model):
 class HinhAnh(models.Model):
     # HinhAnhID (PK)
     SanPham = models.ForeignKey(SanPham, related_name='hinhanhs', on_delete=models.CASCADE, verbose_name="Sản phẩm")
-    Anh = models.CharField(max_length=255, verbose_name="Đường dẫn ảnh")
+    Anh = models.ImageField(upload_to='product_images', verbose_name="Ảnh sản phẩm")
     
     class Meta:
         verbose_name = 'Hình ảnh'

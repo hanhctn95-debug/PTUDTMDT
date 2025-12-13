@@ -20,7 +20,7 @@
         <div class="col-md-5">
             <div class="main-image-box mb-3 border rounded overflow-hidden d-flex align-items-center justify-content-center" style="height: 400px;">
                 {% if images %}
-                    <img id="mainImage" src="{% static images.0.Anh %}" class="img-fluid" style="max-height: 100%;" alt="{{ product.TenSanPham }}">
+                    <img id="mainImage" src="{{ images.0.Anh.url }}" class="img-fluid" style="max-height: 100%;" alt="{{ product.TenSanPham }}">
                 {% else %}
                     <img id="mainImage" src="https://placehold.co/400x400" class="img-fluid" alt="No Image">
                 {% endif %}
@@ -29,8 +29,8 @@
             <div class="d-flex gap-2 overflow-auto">
                 {% for img in images %}
                 <div class="thumb-box border rounded p-1" style="width: 70px; height: 70px; cursor: pointer;" 
-                     onclick="changeImage('{% static img.Anh %}')">
-                    <img src="{% static img.Anh %}" class="w-100 h-100" style="object-fit: contain;">
+                     onclick="changeImage('{{ img.Anh.url }}')">
+                    <img src="{{ img.Anh.url }}" class="w-100 h-100" style="object-fit: contain;">
                 </div>
                 {% endfor %}
             </div>

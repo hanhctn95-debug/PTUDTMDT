@@ -28,4 +28,7 @@ urlpatterns = [
 # Cấu hình Media/Static cho môi trường phát triển (Nếu chưa có)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    # The static() helper is for development only and works with STATIC_ROOT.
+    # Your settings use STATICFILES_DIRS, which is handled automatically by the runserver.
+    # The line below is often not needed if you use STATICFILES_DIRS correctly.
+    # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

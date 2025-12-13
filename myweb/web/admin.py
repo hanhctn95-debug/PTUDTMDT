@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django import forms
+from django.utils.html import format_html
 from .models import (
     DanhMuc, LoaiThuocTinh, PhuongThucThanhToan, GiamGia, KhuyenMai,
     TaiKhoan, DiaChi, SanPham, HinhAnh, SanPham_ThuocTinh, SanPham_KhuyenMai,
@@ -51,10 +53,18 @@ class DiaChiAdmin(admin.ModelAdmin):
 # 3. SẢN PHẨM (PRODUCT MANAGEMENT)
 # =============================================================
 
-# --- INLINES (Các thành phần con của Sản phẩm) ---
 class HinhAnhInline(admin.TabularInline):
     model = HinhAnh
     extra = 1
+    # Thêm các trường để hiển thị ảnh preview
+    readonly_fields = ('image_preview',)
+    fields = ('Anh', 'image_preview')
+
+    def image_preview(self, obj):
+        if obj.Anh:
+            return format_html('<img src="{}" width="150" height="auto" />', obj.Anh.url)
+        return "(Chưa có ảnh)"
+    image_preview.short_description = "Xem trước"
 
 class SanPhamThuocTinhInline(admin.TabularInline):
     model = SanPham_ThuocTinh

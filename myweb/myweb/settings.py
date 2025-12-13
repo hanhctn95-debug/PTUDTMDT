@@ -31,7 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "jazzmin",
+    #'grappelli', # grappelli MUST be first for filebrowser
+    "jazzmin", # Temporarily comment out jazzmin to check for conflicts
+    "filebrowser",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,6 +43,10 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "web",
 ]
+# ...
+
+# Grappelli settings (required for filebrowser)
+GRAPPELLI_ADMIN_TITLE = 'Quản lý ảnh sản phẩm' # Your desired title
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -133,10 +139,25 @@ STATIC_URL = "static/"
 import os
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'web', 'static'), # Add this line for your 'web' app's static files
 ]
+
+# Media files (User uploaded content)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'web', 'static')
+
+# Filebrowser settings
+FILEBROWSER_VERSIONS_BASEDIR = '_versions' # Subdirectory for image versions
+FILEBROWSER_MAX_UPLOAD_SIZE = 10 * 1024 * 1024 # 10 MB limit
+FILEBROWSER_DIRECTORY = 'img/' # Default upload directory within MEDIA_ROOT
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Media files (uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 
