@@ -54,11 +54,13 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <div class="input-group input-group-sm" style="width: 80px;">
-                                        <input type="number" class="form-control text-center" value="{{ item.SoLuong }}" min="1">
+                                    <div class="input-group input-group-sm" style="width: 120px;">
+                                        <button class="btn btn-outline-secondary decrease-quantity" type="button" data-item-id="{{ item.id }}">-</button>
+                                        <input type="number" class="form-control text-center quantity-input" value="{{ item.SoLuong }}" min="1" data-item-id="{{ item.id }}">
+                                        <button class="btn btn-outline-secondary increase-quantity" type="button" data-item-id="{{ item.id }}">+</button>
                                     </div>
                                 </td>
-                                <td class="fw-bold text-danger">{{ item.tong_gia|format_price }}</td>
+                                <td class="fw-bold text-danger item-total" id="item-total-{{ item.id }}">{{ item.tong_gia|format_price }}</td>
                                 <td>
                                     <a href="{% url 'web:remove_from_cart' item.id %}" class="text-secondary" onclick="return confirm('Bạn có chắc muốn xóa?');">
                                         <i class="fas fa-trash-alt"></i>
@@ -78,11 +80,11 @@
                     <h5 class="fw-bold mb-4">Cộng giỏ hàng</h5>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="text-muted">Tạm tính:</span>
-                        <span class="fw-bold">{{ tong_tien|format_price }}</span>
+                        <span class="fw-bold" id="subtotal-price">{{ tong_tien|format_price }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-4 border-top pt-3">
                         <span class="fw-bold fs-5">Tổng cộng:</span>
-                        <span class="fw-bold fs-5 text-danger">{{ tong_tien|format_price }}</span>
+                        <span class="fw-bold fs-5 text-danger" id="cart-total-price">{{ tong_tien|format_price }}</span>
                     </div>
                     
                     <div class="d-grid gap-2">
@@ -102,4 +104,119 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const increaseButtons = document.querySelectorAll('.increase-quantity');
+        const decreaseButtons = document.querySelectorAll('.decrease-quantity');
+        const cartTotalPriceElement = document.getElementById('cart-total-price');
+        const subtotalPriceElement = document.getElementById('subtotal-price');
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        async function updateCartItemQuantity(itemId, newQuantity, inputElement) {
+            if (newQuantity < 1) {
+                alert('Số lượng phải ít nhất là 1.');
+                inputElement.value = 1; // Revert to 1 if tried to set less than 1
+                return;
+            }
+
+            try {
+                const response = await fetch('{% url "web:update_cart_quantity" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({
+                        item_id: itemId,
+                        quantity: newQuantity
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const itemTotalElement = document.getElementById(`item-total-${itemId}`);
+                    if (itemTotalElement) {
+                        itemTotalElement.textContent = formatPrice(data.item_total);
+                    }
+                    if (cartTotalPriceElement) {
+                        cartTotalPriceElement.textContent = formatPrice(data.cart_total);
+                    }
+                    if (subtotalPriceElement) {
+                        subtotalPriceElement.textContent = formatPrice(data.cart_total);
+                    }
+                } else {
+                    alert('Lỗi cập nhật số lượng: ' + data.error);
+                    // Revert input to its previous valid state if update failed
+                    // This might require storing the initial value or fetching it again
+                    // For now, simply alert and let user re-enter
+                    if (inputElement) {
+                        inputElement.value = inputElement.defaultValue; // Revert to initial value if available
+                    }
+                }
+            } catch (error) {
+                console.error('Lỗi AJAX:', error);
+                alert('Đã xảy ra lỗi khi cập nhật giỏ hàng.');
+                if (inputElement) {
+                    inputElement.value = inputElement.defaultValue;
+                }
+            }
+        }
+
+        // Helper function to format price (assuming similar to Django's format_price filter)
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+        }
+
+        quantityInputs.forEach(input => {
+            input.defaultValue = input.value; // Store initial value
+            input.addEventListener('change', function() {
+                const itemId = this.dataset.itemId;
+                const newQuantity = parseInt(this.value);
+                updateCartItemQuantity(itemId, newQuantity, this);
+            });
+        });
+
+        increaseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.dataset.itemId;
+                const input = document.querySelector(`.quantity-input[data-item-id="${itemId}"]`);
+                let newQuantity = parseInt(input.value) + 1;
+                input.value = newQuantity;
+                updateCartItemQuantity(itemId, newQuantity, input);
+            });
+        });
+
+        decreaseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.dataset.itemId;
+                const input = document.querySelector(`.quantity-input[data-item-id="${itemId}"]`);
+                let newQuantity = parseInt(input.value) - 1;
+                input.value = newQuantity;
+                updateCartItemQuantity(itemId, newQuantity, input);
+            });
+        });
+    });
+</script>
 {% endblock %}

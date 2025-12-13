@@ -21,6 +21,7 @@ urlpatterns = [
     path('them-vao-gio/<int:product_id>/', cart_view.add_to_cart, name='add_to_cart'),
     
     path('xoa-khoi-gio/<int:item_id>/', cart_view.remove_from_cart, name='remove_from_cart'),
+    path('cap-nhat-so-luong-gio-hang/', cart_view.update_cart_quantity, name='update_cart_quantity'),
     path('tai-khoan/dia-chi/', profile_view.address_book, name='profile_addresses'),
     path('tai-khoan/dia-chi/mac-dinh/<int:address_id>/', profile_view.set_default_address, name='set_default_address'),
     path('tai-khoan/dia-chi/xoa/<int:address_id>/', profile_view.delete_address, name='delete_address'),

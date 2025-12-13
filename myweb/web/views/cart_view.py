@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from ..models import SanPham, GioHang, ChiTietGioHang, TaiKhoan
 from django.contrib import messages
+from django.http import JsonResponse 
+from django.views.decorators.http import require_POST 
+import json 
 
 # 1. HÀM THÊM VÀO GIỎ (Dùng khi bấm nút "Thêm" ở trang chủ/chi tiết)
 def add_to_cart(request, product_id):
@@ -22,6 +25,11 @@ def add_to_cart(request, product_id):
             if so_luong_them < 1: # Đảm bảo số lượng hợp lệ
                 so_luong_them = 1
 
+        # --- BẮT ĐẦU THÊM KIỂM TRA TỒN KHO ---
+        if san_pham.SoLuongTonKho == 0:
+            messages.error(request, f"Sản phẩm '{san_pham.TenSanPham}' hiện đã hết hàng.")
+            return redirect(request.META.get('HTTP_REFERER', 'web:home'))
+
         # 3. Lấy hoặc tạo Giỏ hàng cho khách này
         gio_hang, _ = GioHang.objects.get_or_create(TaiKhoan=khach_hang)
 
@@ -31,6 +39,22 @@ def add_to_cart(request, product_id):
             SanPham=san_pham,
             defaults={'SoLuong': 0}
         )
+
+        current_qty_in_cart = cart_item.SoLuong
+        requested_total_qty = current_qty_in_cart + so_luong_them
+
+        if requested_total_qty > san_pham.SoLuongTonKho:
+            # Nếu số lượng yêu cầu vượt quá tồn kho, chỉ cho phép thêm tối đa
+            if current_qty_in_cart < san_pham.SoLuongTonKho:
+                allowed_to_add = san_pham.SoLuongTonKho - current_qty_in_cart
+                cart_item.SoLuong = san_pham.SoLuongTonKho
+                cart_item.save()
+                messages.warning(request, f"Chỉ thêm được {allowed_to_add} sản phẩm '{san_pham.TenSanPham}' vào giỏ do không đủ hàng. Tổng số lượng trong giỏ hiện tại là {san_pham.SoLuongTonKho}.")
+            else:
+                messages.error(request, f"Sản phẩm '{san_pham.TenSanPham}' trong giỏ đã đạt số lượng tối đa có thể mua ({san_pham.SoLuongTonKho}).")
+            return redirect(request.META.get('HTTP_REFERER', 'web:home'))
+        
+        # --- KẾT THÚC THÊM KIỂM TRA TỒN KHO ---
 
         # 5. Tăng số lượng
         cart_item.SoLuong += so_luong_them
@@ -106,3 +130,62 @@ def remove_from_cart(request, item_id):
         except:
             pass
     return redirect('web:view_cart')
+
+@require_POST
+def update_cart_quantity(request):
+    if 'khach_hang_id' not in request.session:
+        return JsonResponse({'success': False, 'error': 'Bạn chưa đăng nhập.'}, status=401)
+
+    try:
+        data = json.loads(request.body)
+        item_id = data.get('item_id')
+        quantity = data.get('quantity')
+
+        if not item_id or not quantity:
+            return JsonResponse({'success': False, 'error': 'Thiếu ID sản phẩm hoặc số lượng.'}, status=400)
+
+        quantity = int(quantity)
+        if quantity < 1:
+            return JsonResponse({'success': False, 'error': 'Số lượng phải lớn hơn 0.'}, status=400)
+
+        kh_id = request.session['khach_hang_id']
+        khach_hang = TaiKhoan.objects.get(pk=kh_id)
+        
+        cart_item = get_object_or_404(ChiTietGioHang, pk=item_id, GioHang__TaiKhoan=khach_hang)
+        
+        san_pham = cart_item.SanPham
+        if quantity > san_pham.SoLuongTonKho:
+            return JsonResponse({'success': False, 'error': f"Chỉ còn {san_pham.SoLuongTonKho} sản phẩm '{san_pham.TenSanPham}' trong kho."}, status=400)
+        
+        cart_item.SoLuong = quantity
+        cart_item.save()
+
+        # Recalculate item total and cart total
+        new_price, _, _ = cart_item.SanPham.get_discounted_price()
+        item_total = new_price * cart_item.SoLuong
+
+        # Get the cart and recalculate total
+        gio_hang = cart_item.GioHang
+        cart_items = ChiTietGioHang.objects.filter(GioHang=gio_hang).select_related('SanPham')
+        cart_total = 0
+        for item in cart_items:
+            item_new_price, _, _ = item.SanPham.get_discounted_price()
+            cart_total += item_new_price * item.SoLuong
+
+        return JsonResponse({
+            'success': True,
+            'item_id': item_id,
+            'new_quantity': quantity,
+            'item_total': item_total,
+            'cart_total': cart_total
+        })
+
+    except TaiKhoan.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Khách hàng không tồn tại.'}, status=404)
+    except ChiTietGioHang.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Sản phẩm trong giỏ hàng không tồn tại.'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Dữ liệu JSON không hợp lệ.'}, status=400)
+    except Exception as e:
+        print(f"Lỗi cập nhật số lượng giỏ hàng: {e}")
+        return JsonResponse({'success': False, 'error': f'Đã xảy ra lỗi: {str(e)}'}, status=500)

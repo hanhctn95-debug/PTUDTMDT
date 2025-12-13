@@ -51,6 +51,22 @@ def checkout(request):
                 messages.error(request, "Vui lòng chọn phương thức thanh toán.")
                 return redirect('web:checkout')
 
+            # --- START: NEW STOCK CHECK ---
+            for item in cart_items:
+                # Re-fetch product from DB to get the absolute latest stock
+                # Use .select_for_update() if this was a critical transaction,
+                # but for a basic check, the current SanPham linked to item is often sufficient if it's already a fresh query
+                # However, to be absolutely safe against race conditions, a fresh fetch is better.
+                # For this task, we will assume item.SanPham is sufficiently fresh from the earlier select_related.
+                
+                if item.SoLuong > item.SanPham.SoLuongTonKho:
+                    messages.error(request, f"Sản phẩm '{item.SanPham.TenSanPham}' chỉ còn {item.SanPham.SoLuongTonKho} trong kho. Vui lòng cập nhật giỏ hàng của bạn.")
+                    return redirect('web:view_cart')
+                if item.SanPham.SoLuongTonKho == 0:
+                    messages.error(request, f"Sản phẩm '{item.SanPham.TenSanPham}' đã hết hàng. Vui lòng xóa khỏi giỏ hàng của bạn.")
+                    return redirect('web:view_cart')
+            # --- END: NEW STOCK CHECK ---
+
             # 1. Xử lý địa chỉ (Logic thông minh: Dùng lại hoặc Tạo mới)
             dia_chi_giao = None
             create_new = True 

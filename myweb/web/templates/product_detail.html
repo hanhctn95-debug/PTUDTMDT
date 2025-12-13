@@ -69,22 +69,28 @@
                 <div class="mb-4 d-flex align-items-center">
                     <label for="qtyInput" class="me-3 fw-bold">Số lượng:</label>
                     <div class="input-group" style="width: 140px;">
-                        <button class="btn btn-outline-secondary" type="button" onclick="updateQty(-1)">-</button>
-                        <input type="text" class="form-control text-center" id="qtyInput" name="quantity" value="1" readonly>
-                        <button class="btn btn-outline-secondary" type="button" onclick="updateQty(1)">+</button>
+                        <button class="btn btn-outline-secondary" type="button" onclick="updateQty(-1)" {% if product.SoLuongTonKho == 0 %}disabled{% endif %}>-</button>
+                        <input type="text" class="form-control text-center" id="qtyInput" name="quantity" value="{% if product.SoLuongTonKho > 0 %}1{% else %}0{% endif %}" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="updateQty(1)" {% if product.SoLuongTonKho == 0 %}disabled{% endif %}>+</button>
                     </div>
                 </div>
 
                 <input type="hidden" name="action" id="formAction" value="">
 
                 <div class="d-flex gap-3">
-                    <button type="submit" class="btn btn-outline-primary btn-lg flex-grow-1">
-                        <i class="fas fa-cart-plus"></i> Thêm vào giỏ
-                    </button>
-                    <button type="button" id="buyNowBtn" 
-                            class="btn btn-primary btn-lg flex-grow-1 text-decoration-none d-flex align-items-center justify-content-center">
-                        Mua ngay
-                    </button>
+                    {% if product.SoLuongTonKho > 0 %}
+                        <button type="submit" class="btn btn-outline-primary btn-lg flex-grow-1">
+                            <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+                        </button>
+                        <button type="button" id="buyNowBtn" 
+                                class="btn btn-primary btn-lg flex-grow-1 text-decoration-none d-flex align-items-center justify-content-center">
+                            Mua ngay
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn btn-danger btn-lg flex-grow-1" disabled>
+                            <i class="fas fa-ban"></i> Hết hàng
+                        </button>
+                    {% endif %}
                 </div>
             </form>
         </div>
@@ -97,9 +103,9 @@
     
     <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3">
         {% for sp in related_products %}
-        <div class="col">
-            {% include "includes/product_card.html" %}
-        </div>
+            <div class="col">
+                {% include "includes/product_card.html" %}
+            </div>
         {% endfor %}
     </div>
 </section>
@@ -223,17 +229,25 @@
 
     function updateQty(change) {
         let input = document.getElementById('qtyInput');
-        let newVal = parseInt(input.value) + change;
-        if (newVal >= 1) {
+        let currentVal = parseInt(input.value);
+        let maxStock = parseInt("{{ product.SoLuongTonKho }}");
+        let newVal = currentVal + change;
+
+        if (newVal >= 1 && newVal <= maxStock) {
             input.value = newVal;
+        } else if (newVal > maxStock) {
+            alert('Số lượng tối đa có thể mua là ' + maxStock + ' sản phẩm.');
+        } else if (newVal < 1) {
+            input.value = 1; // Không cho phép giảm xuống dưới 1
         }
     }
 
-    document.getElementById('buyNowBtn').addEventListener('click', function() {
-        // Đặt action là 'buy_now' và submit form
-        document.getElementById('formAction').value = 'buy_now';
-        document.getElementById('addToCartForm').submit();
-    });
+    {% if product.SoLuongTonKho > 0 %}
+        document.getElementById('buyNowBtn').addEventListener('click', function() {
+            document.getElementById('formAction').value = 'buy_now';
+            document.getElementById('addToCartForm').submit();
+        });
+    {% endif %}
 </script>
 
 {% endblock %}

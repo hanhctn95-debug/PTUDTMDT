@@ -11,7 +11,7 @@ def index(request):
     now = timezone.now()
     san_pham = SanPham.objects.filter(
         khuyen_mai__NgayBatDau__lte=now,
-        khuyen_mai__NgayKetThuc__gte=now
+        khuyen_mai__NgayKetThuc__gte=now,
     ).distinct().prefetch_related('hinhanhs').order_by('-id')
 
 
