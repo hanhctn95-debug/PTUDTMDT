@@ -107,7 +107,7 @@
                 <div style="width: 100%; height: 100%; border-radius: 8px; border: 1px solid #e5e5e5; overflow: hidden; background: #fff;">
                     {% with first_img=item.SanPham.hinhanhs.first %}
                         {% if first_img %}
-                            <img src="{% static first_img.Anh %}" style="width: 100%; height: 100%; object-fit: contain;">
+                            <img src="{{ first_img.Anh.url }}" style="width: 100%; height: 100%; object-fit: contain;">
                         {% else %}
                             <img src="https://placehold.co/64" style="width: 100%; height: 100%; object-fit: contain;">
                         {% endif %}

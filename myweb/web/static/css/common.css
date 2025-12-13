@@ -589,3 +589,21 @@ footer {
 .rate > label:hover ~ input:checked ~ label {
   color: #c59b08;
 }
+
+.profile-content-area {
+    min-height: 65vh; 
+}
+
+/* =================================
+   STICKY FOOTER & LAYOUT
+   ================================= */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+

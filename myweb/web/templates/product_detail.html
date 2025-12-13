@@ -104,7 +104,7 @@
     <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3">
         {% for sp in related_products %}
             <div class="col">
-                {% include "includes/product_card.html" %}
+                {% include "includes/product_card.html" with sp=sp %}
             </div>
         {% endfor %}
     </div>
@@ -223,14 +223,15 @@
 </section>
 
 <script>
+    const maxStock = parseInt("{{ product.SoLuongTonKho|default:'0' }}");
+
     function changeImage(src) {
         document.getElementById('mainImage').src = src;
     }
 
     function updateQty(change) {
-        let input = document.getElementById('qtyInput');
+        const input = document.getElementById('qtyInput');
         let currentVal = parseInt(input.value);
-        let maxStock = parseInt("{{ product.SoLuongTonKho }}");
         let newVal = currentVal + change;
 
         if (newVal >= 1 && newVal <= maxStock) {
@@ -242,12 +243,15 @@
         }
     }
 
-    {% if product.SoLuongTonKho > 0 %}
-        document.getElementById('buyNowBtn').addEventListener('click', function() {
-            document.getElementById('formAction').value = 'buy_now';
-            document.getElementById('addToCartForm').submit();
-        });
-    {% endif %}
+    if (maxStock > 0) {
+        const buyNowBtn = document.getElementById('buyNowBtn');
+        if (buyNowBtn) {
+            buyNowBtn.addEventListener('click', function() {
+                document.getElementById('formAction').value = 'buy_now';
+                document.getElementById('addToCartForm').submit();
+            });
+        }
+    }
 </script>
 
 {% endblock %}

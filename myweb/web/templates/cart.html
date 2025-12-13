@@ -29,7 +29,7 @@
                                     <div class="d-flex align-items-center">
                                         {% with first_img=item.SanPham.hinhanhs.first %}
                                             {% if first_img %}
-                                                <img src="{% static first_img.Anh %}" width="60" height="60" class="rounded border me-3" style="object-fit: contain;">
+                                                <img src="{{ first_img.Anh.url }}" width="60" height="60" class="rounded border me-3" style="object-fit: contain;">
                                             {% else %}
                                                 <img src="https://placehold.co/60" width="60" class="rounded me-3">
                                             {% endif %}

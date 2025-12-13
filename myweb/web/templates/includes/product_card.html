@@ -7,7 +7,7 @@
     <a href="{% url 'web:product_detail' sp.id %}" class="product-image-link card-img-top"> 
         {% with first_img=sp.hinhanhs.first %}
             {% if first_img %}
-                <img src="{% static first_img.Anh %}" alt="{{ sp.TenSanPham }}" class="product-img">
+                <img src="{{ first_img.Anh.url }}" alt="{{ sp.TenSanPham }}" class="product-img">
             {% else %}
                 <img src="https://placehold.co/200x200?text=No+Image" alt="Chưa có ảnh" class="product-img">
             {% endif %}
@@ -46,15 +46,9 @@
             <a href="{% url 'web:product_detail' sp.id %}" class="btn btn-detail">
                 Chi tiết
             </a> 
-            {% if sp.SoLuongTonKho > 0 %}
-                <a href="{% url 'web:add_to_cart' sp.id %}" class="btn btn-add-to-cart">
-                    <i class="fas fa-cart-plus"></i> Thêm
-                </a>
-            {% else %}
-                <button type="button" class="btn btn-add-to-cart disabled" disabled>
-                    <i class="fas fa-ban"></i> Hết hàng
-                </button>
-            {% endif %}
+            <a href="{% url 'web:add_to_cart' sp.id %}" class="btn btn-add-to-cart">
+                <i class="fas fa-cart-plus"></i> Thêm
+            </a>
         </div>
     </div>
 </div>

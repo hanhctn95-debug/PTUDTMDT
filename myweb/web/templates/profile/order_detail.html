@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        <div class="col-md-9">
+        <div class="col-md-9 profile-content-area">
             <div class="mb-3">
                 <a href="{% url 'web:profile_orders' %}" class="text-decoration-none text-muted">
                     <i class="fas fa-arrow-left"></i> Quay lại danh sách đơn hàng
@@ -102,7 +102,7 @@
                                         <div class="d-flex align-items-center">
                                             {% with first_img=item.SanPham.hinhanhs.first %}
                                                 {% if first_img %}
-                                                    <img src="{% static first_img.Anh %}" width="50" height="50" class="rounded border me-2" style="object-fit: contain;">
+                                                    <img src="{{ first_img.Anh.url }}" width="50" height="50" class="rounded border me-2" style="object-fit: contain;">
                                                 {% else %}
                                                     <img src="https://placehold.co/50" class="rounded border me-2">
                                                 {% endif %}
