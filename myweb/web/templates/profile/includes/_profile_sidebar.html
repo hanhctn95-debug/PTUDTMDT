@@ -1,0 +1,31 @@
+<div class="card profile-card">
+    <div class="card-body text-center pt-4 pb-3">
+        <div class="avatar-circle">
+            {{ user.TenKhachHang|slice:":1"|upper }}
+        </div>
+        <h6 class="fw-bold mb-0">Xin chào,</h6>
+        <p class="text-muted">{{ user.TenKhachHang }}</p>
+    </div>
+    
+    <div class="list-group p-2 profile-sidebar">
+        <a href="{% url 'web:profile_info' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'profile_info' %}active{% endif %}">
+            <i class="fas fa-user"></i> Thông tin tài khoản
+        </a>
+        
+        <a href="{% url 'web:profile_membership' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'profile_membership' %}active{% endif %}">
+            <i class="fas fa-crown"></i> Chương trình thành viên
+        </a>
+
+        <a href="{% url 'web:profile_orders' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'profile_orders' %}active{% endif %}">
+            <i class="fas fa-clipboard-list"></i> Danh sách đơn hàng
+        </a>
+
+        <a href="{% url 'web:profile_addresses' %}" class="list-group-item list-group-item-action {% if request.resolver_match.url_name == 'profile_addresses' %}active{% endif %}">
+            <i class="fas fa-map-marker-alt"></i> Sổ địa chỉ
+        </a>
+
+        <a href="{% url 'web:logout' %}" class="list-group-item list-group-item-action text-danger">
+            <i class="fas fa-sign-out-alt"></i> Đăng xuất
+        </a>
+    </div>
+</div>

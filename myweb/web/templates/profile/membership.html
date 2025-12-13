@@ -1,175 +1,131 @@
-{% extends "base.html" %}
+{% extends "profile/base_profile.html" %}
 {% load static %}
 {% load humanize %}
 {% load price_filters %}
 
-{% block content %}
-<style>
-    /* COPY STYLE TỪ TRANG INFO SANG ĐỂ ĐỒNG BỘ */
-    .profile-sidebar .list-group-item {
-        border: none;
-        padding: 12px 20px;
-        font-weight: 500;
-        color: #333;
-        margin-bottom: 5px;
-        border-radius: 5px;
-        transition: all 0.2s;
-    }
-    .profile-sidebar .list-group-item i {
-        width: 25px;
-    }
-    .profile-sidebar .list-group-item:hover {
-        background-color: #e9ecef;
-        color: #0d6efd;
-    }
-    .profile-sidebar .list-group-item.active {
-        background-color: #ff9800 !important; /* Dùng !important để đè màu xanh mặc định */
-        border-color: #ff9800 !important;
-        color: white;
-    }
-    .avatar-circle {
-        width: 80px;
-        height: 80px;
-        background-color: #ff9800;
-        color: white;
-        font-size: 32px;
-        font-weight: bold;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 10px;
-    }
+{% block profile_content %}
+<div class="membership-page-container p-lg-4 p-2">
 
-    /* CSS RIÊNG CHO PHẦN RANK */
-    .rank-icon-lg {
-        width: 100px;
-        height: 100px;
-        object-fit: contain;
-        margin-bottom: 20px;
-    }
-    .info-row {
-        padding: 12px 0;
-        border-bottom: 1px dashed #eee;
-        display: flex;
-        justify-content: space-between;
-    }
-    .info-row:last-child {
-        border-bottom: none;
-    }
-</style>
+    <!-- Card Tổng Quan -->
+    <div class="card membership-overview-card gold-gradient shadow-lg rounded-4 mb-4">
+        <div class="card-body text-center text-white p-4 p-md-5">
+            <div class="mb-3">
+                <i class="fas fa-medal rank-icon-main rank-icon-glow"></i>
+            </div>
+            <p class="text-uppercase small-caps mb-1" style="opacity: 0.8;">Tổng chi tiêu tích lũy</p>
+            <h2 class="total-spending-amount fw-bold mb-4">{{ tong_tien|format_price }}</h2>
 
-<div class="container mt-4 mb-5">
-    <div class="row">
-        
-        <div class="col-md-3 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center pt-4 pb-3">
-                    <div class="avatar-circle">
-                        {{ user.TenKhachHang|slice:":1"|upper }}
+            {% if hang_tiep_theo != 'Max Level' %}
+                <div class="progress-info mx-auto" style="max-width: 400px;">
+                    <p class="mb-2">Để lên hạng <strong>{{ hang_tiep_theo }}</strong>, bạn cần chi tiêu thêm <strong class="text-white">{{ tien_len_hang|format_price }}</strong></p>
+                    <div class="progress rounded-pill" style="height: 12px; background-color: rgba(0,0,0,0.2);">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-white" role="progressbar" style="width: {{ progress_percent|default:0 }}%" aria-valuenow="{{ progress_percent|default:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
-                    <h6 class="fw-bold">Xin chào, {{ user.TenKhachHang }}</h6>
                 </div>
-                
-                <div class="list-group list-group-flush p-3 profile-sidebar">
-                    <a href="{% url 'web:profile_info' %}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-user"></i> Thông tin tài khoản
-                    </a>
-                    <a href="{% url 'web:profile_membership' %}" class="list-group-item list-group-item-action active">
-                        <i class="fas fa-crown"></i> Chương trình thành viên
-                    </a>
-                    <a href="{% url 'web:profile_orders' %}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-clipboard-list"></i> Danh sách đơn hàng
-                    </a>
-                    <a href="{% url 'web:profile_addresses' %}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-map-marker-alt"></i> Sổ địa chỉ
-                    </a>
-                    <a href="{% url 'web:logout' %}" class="list-group-item list-group-item-action text-danger">
-                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                    </a>
+            {% else %}
+                <div class="d-inline-flex align-items-center gap-2 alert-max-level px-3 py-2 rounded-pill">
+                    <i class="fas fa-trophy"></i>
+                    <span>Chúc mừng! Bạn đã đạt hạng thành viên cao nhất.</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Thông tin chi tiết -->
+    <div class="info-grid mb-5">
+        <div class="row g-3 text-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card rounded-4 shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted small-caps">Hạng Hiện Tại</h6>
+                        <span class="badge rank-badge rank-badge-{{ hang_hien_tai|lower|default:'new' }}">{{ hang_hien_tai|default:"New" }}</span>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="col-md-9 profile-content-area">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                    <h5 class="fw-bold text-uppercase text-primary">Hạng thành viên</h5>
-                </div>
-
-                <div class="card-body p-4 text-center">
-                    
-                    {% if hang_hien_tai == 'Silver' %}
-                        <img src="https://cdn-icons-png.flaticon.com/512/179/179251.png" class="rank-icon-lg" alt="Silver">
-                    {% elif hang_hien_tai == 'Gold' %}
-                        <img src="https://cdn-icons-png.flaticon.com/512/179/179249.png" class="rank-icon-lg" alt="Gold">
-                    {% elif hang_hien_tai == 'Platinum' %}
-                        <img src="https://cdn-icons-png.flaticon.com/512/179/179250.png" class="rank-icon-lg" alt="Platinum">
-                    {% elif hang_hien_tai == 'Diamond' %}
-                        <img src="https://cdn-icons-png.flaticon.com/512/179/179247.png" class="rank-icon-lg" alt="Diamond">
-                    {% else %}
-                        <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" class="rank-icon-lg" alt="New">
-                    {% endif %}
-
-                    <div class="mt-2 text-start mx-auto p-3 bg-light rounded" style="max-width: 600px;">
-                        
-                        <div class="info-row">
-                            <span class="text-muted">Tổng chi tiêu tích lũy:</span>
-                            <span class="fw-bold text-danger fs-5">{{ tong_tien|format_price }}</span>
-                        </div>
-
-                        <div class="info-row">
-                            <span class="text-muted">Hạng thành viên hiện tại:</span>
-                            <span class="fw-bold text-uppercase" style="color: #ff9800;">{{ hang_hien_tai }}</span>
-                        </div>
-
+            <div class="col-md-6 col-lg-4">
+                <div class="card rounded-4 shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted small-caps">Hạng Tiếp Theo</h6>
                         {% if hang_tiep_theo != 'Max Level' %}
-                            <div class="info-row border-0">
-                                <span class="text-muted">Hạng tiếp theo:</span>
-                                <span class="fw-bold text-primary">{{ hang_tiep_theo }}</span>
-                            </div>
-                            
-                            <div class="alert alert-info mt-3 d-flex align-items-center">
-                                <i class="fas fa-info-circle me-2 fs-4"></i>
-                                <div>
-                                    Bạn cần chi tiêu thêm <strong class="text-danger fs-5">{{ tien_len_hang|format_price }}</strong> 
-                                    nữa để thăng hạng <strong>{{ hang_tiep_theo }}</strong>.
-                                </div>
-                            </div>
+                            <span class="badge rank-badge rank-badge-{{ hang_tiep_theo|lower }}">{{ hang_tiep_theo }}</span>
                         {% else %}
-                            <div class="alert alert-success mt-3 text-center">
-                                <i class="fas fa-trophy text-warning"></i> Chúc mừng! Bạn đã đạt hạng cao nhất <strong>Diamond</strong>.
-                            </div>
+                            <span class="text-muted">-</span>
                         {% endif %}
-
                     </div>
-
-                    <div class="mt-5">
-                        <h6 class="fw-bold mb-3 text-uppercase text-muted" style="font-size: 0.9rem;">Chi tiết các hạng</h6>
-                        <div class="d-flex justify-content-center flex-wrap gap-2">
-                            <div class="p-2 border rounded text-center" style="min-width: 100px;">
-                                <div class="fw-bold text-secondary">Silver</div>
-                                <small style="font-size: 0.75rem;">> 1 Triệu</small>
-                            </div>
-                            <div class="p-2 border rounded text-center" style="min-width: 100px; background-color: #fff3cd;">
-                                <div class="fw-bold text-warning">Gold</div>
-                                <small style="font-size: 0.75rem;">> 3 Triệu</small>
-                            </div>
-                            <div class="p-2 border rounded text-center" style="min-width: 100px; background-color: #e2e3e5;">
-                                <div class="fw-bold text-dark">Platinum</div>
-                                <small style="font-size: 0.75rem;">> 7 Triệu</small>
-                            </div>
-                            <div class="p-2 border rounded text-center" style="min-width: 100px; background-color: #cff4fc;">
-                                <div class="fw-bold text-info">Diamond</div>
-                                <small style="font-size: 0.75rem;">> 10 Triệu</small>
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card rounded-4 shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted small-caps">Ưu Đãi</h6>
+                        <p class="fw-bold mb-0" style="color: #004d99;">Giảm giá {{ muc_giam_gia|default:0 }}%</p>
                     </div>
-
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- Chi tiết các hạng -->
+    <div class="rank-tiers-section">
+        <h4 class="text-center fw-bold mb-4">Khám Phá Các Hạng Thành Viên</h4>
+        <div class="row g-4">
+            <!-- Silver Card -->
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="card rank-tier-card w-100 rounded-4 shadow-sm {% if hang_hien_tai == 'Silver' %}current-rank-card{% endif %}">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="tier-icon-wrapper mb-3" style="color: #C0C0C0;">
+                            <i class="fas fa-shield-alt fa-2x"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Silver</h5>
+                        <p class="card-text text-muted small flex-grow-1">Chi tiêu tích lũy trên</p>
+                        <p class="fs-5 fw-bold text-primary">{{ 1000000|format_price }}</p>
+                        {% if hang_hien_tai == 'Silver' %}<div class="current-rank-marker"><i class="fas fa-check-circle"></i> Hạng của bạn</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- Gold Card -->
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="card rank-tier-card w-100 rounded-4 shadow-sm {% if hang_hien_tai == 'Gold' %}current-rank-card{% endif %}">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="tier-icon-wrapper mb-3" style="color: #FFD700;">
+                            <i class="fas fa-star fa-2x"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Gold</h5>
+                        <p class="card-text text-muted small flex-grow-1">Chi tiêu tích lũy trên</p>
+                        <p class="fs-5 fw-bold text-primary">{{ 3000000|format_price }}</p>
+                        {% if hang_hien_tai == 'Gold' %}<div class="current-rank-marker"><i class="fas fa-check-circle"></i> Hạng của bạn</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- Platinum Card -->
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="card rank-tier-card w-100 rounded-4 shadow-sm {% if hang_hien_tai == 'Platinum' %}current-rank-card{% endif %}">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="tier-icon-wrapper mb-3" style="color: #E5E4E2;">
+                            <i class="fas fa-gem fa-2x"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Platinum</h5>
+                        <p class="card-text text-muted small flex-grow-1">Chi tiêu tích lũy trên</p>
+                        <p class="fs-5 fw-bold text-primary">{{ 7000000|format_price }}</p>
+                        {% if hang_hien_tai == 'Platinum' %}<div class="current-rank-marker"><i class="fas fa-check-circle"></i> Hạng của bạn</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- Diamond Card -->
+            <div class="col-md-6 col-lg-3 d-flex align-items-stretch">
+                <div class="card rank-tier-card w-100 rounded-4 shadow-sm {% if hang_hien_tai == 'Diamond' %}current-rank-card{% endif %}">
+                    <div class="card-body text-center d-flex flex-column">
+                        <div class="tier-icon-wrapper mb-3" style="color: #B9F2FF;">
+                            <i class="fas fa-crown fa-2x"></i>
+                        </div>
+                        <h5 class="card-title fw-bold">Diamond</h5>
+                        <p class="card-text text-muted small flex-grow-1">Chi tiêu tích lũy trên</p>
+                        <p class="fs-5 fw-bold text-primary">{{ 10000000|format_price }}</p>
+                        {% if hang_hien_tai == 'Diamond' %}<div class="current-rank-marker"><i class="fas fa-check-circle"></i> Hạng của bạn</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -1,142 +1,116 @@
-{% extends "base.html" %}
+{% extends "profile/base_profile.html" %}
 {% load static %}
 
-{% block content %}
-<style>
-    .profile-sidebar .list-group-item { border: none; padding: 12px 20px; font-weight: 500; color: #333; margin-bottom: 5px; border-radius: 5px; transition: all 0.2s; }
-    .profile-sidebar .list-group-item:hover { background-color: #e9ecef; color: #0d6efd; }
-    .profile-sidebar .list-group-item.active { background-color: #ff9800 !important; border-color: #ff9800 !important; color: white; }
-    .avatar-circle { width: 80px; height: 80px; background-color: #ff9800; color: white; font-size: 32px; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
-</style>
+{% block profile_content %}
+<div class="card profile-card">
+    <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold text-uppercase m-0" style="color: #004d99;">Địa chỉ của bạn</h5>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+            <i class="fas fa-plus me-2"></i> Thêm địa chỉ mới
+        </button>
+    </div>
+    
+    <div class="card-body p-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
 
-<div class="container mt-4 mb-5">
-    <div class="row">
-        
-        <div class="col-md-3 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center pt-4 pb-3">
-                    <div class="avatar-circle">{{ user.TenKhachHang|slice:":1"|upper }}</div>
-                    <h6 class="fw-bold">Xin chào, {{ user.TenKhachHang }}</h6>
-                </div>
-                <div class="list-group list-group-flush p-3 profile-sidebar">
-                    <a href="{% url 'web:profile_info' %}" class="list-group-item list-group-item-action"><i class="fas fa-user"></i> Thông tin tài khoản</a>
-                    <a href="{% url 'web:profile_membership' %}" class="list-group-item list-group-item-action"><i class="fas fa-crown"></i> Chương trình thành viên</a>
-                    <a href="{% url 'web:profile_orders' %}" class="list-group-item list-group-item-action"><i class="fas fa-clipboard-list"></i> Danh sách đơn hàng</a>
-                    <a href="{% url 'web:profile_addresses' %}" class="list-group-item list-group-item-action active"><i class="fas fa-map-marker-alt"></i> Sổ địa chỉ</a>
-                    <a href="{% url 'web:logout' %}" class="list-group-item list-group-item-action text-danger"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-9 profile-content-area">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold text-uppercase text-primary m-0">Địa chỉ của bạn</h5>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
-                        <i class="fas fa-plus"></i> Thêm địa chỉ mới
-                    </button>
-                </div>
-                
-                <div class="card-body p-4">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
-
-                    {% if addresses %}
-                        <div class="row g-3">
-                            {% for addr in addresses %}
-                            <div class="col-12">
-                                <div class="border rounded p-3 position-relative {% if addr.MacDinh %}border-success bg-light{% else %}bg-white{% endif %}">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="mb-1">
-                                                <strong>{{ user.TenKhachHang }}</strong>
-                                                <span class="mx-2 text-muted">|</span>
-                                                <span class="text-muted">{{ addr.SDTLienHe }}</span>
-                                                {% if addr.MacDinh %}
-                                                    <span class="badge bg-success ms-2">Mặc định</span>
-                                                {% endif %}
-                                            </div>
-                                            <div class="text-muted small">
-                                                {{ addr.ChiTietDiaChi }}<br>
-                                                {{ addr.Phuong_Xa }}, {{ addr.Tinh_Thanh_Pho }}
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="text-end">
-                                            {% if not addr.MacDinh %}
-                                                <a href="{% url 'web:set_default_address' addr.id %}" class="btn btn-outline-secondary btn-sm mb-1" style="font-size: 0.75rem;">Thiết lập mặc định</a><br>
-                                            {% endif %}
-                                            
-                                            <a href="#" class="text-primary text-decoration-none small me-2" data-bs-toggle="modal" data-bs-target="#editModal{{ addr.id }}">
-                                                <i class="fas fa-edit"></i> Sửa
-                                            </a>
-
-                                            <a href="{% url 'web:delete_address' addr.id %}" class="text-danger text-decoration-none small" onclick="return confirm('Bạn chắc chắn muốn xóa?');">
-                                                <i class="fas fa-trash"></i> Xóa
-                                            </a>
-                                        </div>
-                                    </div>
+        {% if addresses %}
+            <div class="row g-3">
+                {% for addr in addresses %}
+                <div class="col-12">
+                    <div class="border rounded p-3 position-relative {% if addr.MacDinh %}border-primary bg-primary-light{% else %}bg-white{% endif %}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="mb-1">
+                                    <strong>{{ user.TenKhachHang }}</strong>
+                                    <span class="mx-2 text-muted">|</span>
+                                    <span class="text-muted">{{ addr.SDTLienHe }}</span>
+                                    {% if addr.MacDinh %}
+                                        <span class="badge bg-primary ms-2">Mặc định</span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-muted small">
+                                    {{ addr.ChiTietDiaChi }}<br>
+                                    {{ addr.Phuong_Xa }}, {{ addr.Tinh_Thanh_Pho }}
                                 </div>
                             </div>
-
-                            <div class="modal fade" id="editModal{{ addr.id }}" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title fw-bold">CHỈNH SỬA ĐỊA CHỈ</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <form method="POST" action="{% url 'web:edit_address' addr.id %}">
-                                            {% csrf_token %}
-                                            <div class="modal-body">
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Số điện thoại</label>
-                                                    <input type="text" name="phone" class="form-control" value="{{ addr.SDTLienHe }}" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Tỉnh / Thành phố</label>
-                                                    <input type="text" name="city" class="form-control" value="{{ addr.Tinh_Thanh_Pho }}" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Phường / Xã</label>
-                                                    <input type="text" name="ward" class="form-control" value="{{ addr.Phuong_Xa }}" required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Địa chỉ chi tiết</label>
-                                                    <input type="text" name="address_detail" class="form-control" value="{{ addr.ChiTietDiaChi }}" required>
-                                                </div>
-                                                <div class="form-check mt-3">
-                                                    <input class="form-check-input" type="checkbox" name="is_default" id="defaultEdit{{ addr.id }}" {% if addr.MacDinh %}checked{% endif %}>
-                                                    <label class="form-check-label" for="defaultEdit{{ addr.id }}">Đặt là địa chỉ mặc định</label>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-                                            </div>
-                                        </form>
-                                    </div>
+                            
+                            <div class="text-end">
+                                <div class="dropdown">
+                                    <button class="btn btn-light btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        {% if not addr.MacDinh %}
+                                        <li><a class="dropdown-item" href="{% url 'web:set_default_address' addr.id %}">Thiết lập mặc định</a></li>
+                                        {% endif %}
+                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ addr.id }}">Sửa</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="{% url 'web:delete_address' addr.id %}" onclick="return confirm('Bạn chắc chắn muốn xóa?');">Xóa</a></li>
+                                    </ul>
                                 </div>
                             </div>
-                            {% endfor %}
                         </div>
-                    {% else %}
-                        <div class="text-center py-5">
-                            <img src="https://cdn-icons-png.flaticon.com/512/535/535239.png" width="80" class="mb-3 opacity-50">
-                            <p class="text-muted">Bạn chưa lưu địa chỉ nào.</p>
-                        </div>
-                    {% endif %}
+                    </div>
                 </div>
+
+                <!-- Edit Address Modal -->
+                <div class="modal fade" id="editModal{{ addr.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title fw-bold">CHỈNH SỬA ĐỊA CHỈ</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form method="POST" action="{% url 'web:edit_address' addr.id %}">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Số điện thoại</label>
+                                        <input type="text" name="phone" class="form-control form-control-lg" value="{{ addr.SDTLienHe }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Tỉnh / Thành phố</label>
+                                        <input type="text" name="city" class="form-control form-control-lg" value="{{ addr.Tinh_Thanh_Pho }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Phường / Xã</label>
+                                        <input type="text" name="ward" class="form-control form-control-lg" value="{{ addr.Phuong_Xa }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Địa chỉ chi tiết</label>
+                                        <input type="text" name="address_detail" class="form-control form-control-lg" value="{{ addr.ChiTietDiaChi }}" required>
+                                    </div>
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="checkbox" name="is_default" id="defaultEdit{{ addr.id }}" {% if addr.MacDinh %}checked{% endif %}>
+                                        <label class="form-check-label" for="defaultEdit{{ addr.id }}">Đặt là địa chỉ mặc định</label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Lưu thay đổi</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-        </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-map-marked-alt fa-4x text-muted mb-3"></i>
+                <p class="text-muted">Bạn chưa lưu địa chỉ nào.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 
+<!-- Add Address Modal -->
 <div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title fw-bold">THÊM ĐỊA CHỈ MỚI</h5>
@@ -146,20 +120,20 @@
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Số điện thoại</label>
-                        <input type="text" name="phone" class="form-control" value="{{ user.SDT }}" required>
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="text" name="phone" class="form-control form-control-lg" value="{{ user.SDT }}" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Tỉnh / Thành phố</label>
-                        <input type="text" name="city" class="form-control" placeholder="Ví dụ: Hà Nội" required>
+                        <label class="form-label">Tỉnh / Thành phố</label>
+                        <input type="text" name="city" class="form-control form-control-lg" placeholder="Ví dụ: Hà Nội" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Phường / Xã</label>
-                        <input type="text" name="ward" class="form-control" placeholder="Ví dụ: Phường Minh Khai" required>
+                        <label class="form-label">Phường / Xã</label>
+                        <input type="text" name="ward" class="form-control form-control-lg" placeholder="Ví dụ: Phường Minh Khai" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Địa chỉ chi tiết</label>
-                        <input type="text" name="address_detail" class="form-control" placeholder="Ví dụ: Số 10, Ngõ 5" required>
+                        <label class="form-label">Địa chỉ chi tiết</label>
+                        <input type="text" name="address_detail" class="form-control form-control-lg" placeholder="Ví dụ: Số 10, Ngõ 5" required>
                     </div>
                     <div class="form-check mt-3">
                         <input class="form-check-input" type="checkbox" name="is_default" id="defaultAdd">
@@ -168,11 +142,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Thêm địa chỉ</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus me-2"></i>Thêm địa chỉ</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
 {% endblock %}

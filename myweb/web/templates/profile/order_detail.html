@@ -1,42 +1,11 @@
-{% extends "base.html" %}
+{% extends "profile/base_profile.html" %}
 {% load static %}
 {% load humanize %}
 {% load price_filters %}
 
-{% block content %}
-<style>
-    /* CSS Sidebar đồng bộ */
-    .profile-sidebar .list-group-item { border: none; padding: 12px 20px; font-weight: 500; color: #333; margin-bottom: 5px; border-radius: 5px; transition: all 0.2s; }
-    .profile-sidebar .list-group-item:hover { background-color: #e9ecef; color: #0d6efd; }
-    .profile-sidebar .list-group-item.active { background-color: #ff9800 !important; border-color: #ff9800 !important; color: white; }
-    .avatar-circle { width: 80px; height: 80px; background-color: #ff9800; color: white; font-size: 32px; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
-    
-    /* CSS riêng cho chi tiết đơn */
-    .order-status-badge { font-size: 0.9rem; padding: 8px 15px; border-radius: 20px; }
-    .step-item { position: relative; z-index: 1; }
-    .table-detail th { background-color: #f8f9fa; color: #6c757d; font-weight: 600; }
-</style>
 
-<div class="container mt-4 mb-5">
-    <div class="row">
-        
-        <div class="col-md-3 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center pt-4 pb-3">
-                    <div class="avatar-circle">{{ user.TenKhachHang|slice:":1"|upper }}</div>
-                    <h6 class="fw-bold">Xin chào, {{ user.TenKhachHang }}</h6>
-                </div>
-                <div class="list-group list-group-flush p-3 profile-sidebar">
-                    <a href="{% url 'web:profile_info' %}" class="list-group-item list-group-item-action"><i class="fas fa-user"></i> Thông tin tài khoản</a>
-                    <a href="{% url 'web:profile_membership' %}" class="list-group-item list-group-item-action"><i class="fas fa-crown"></i> Chương trình thành viên</a>
-                    <a href="{% url 'web:profile_orders' %}" class="list-group-item list-group-item-action active"><i class="fas fa-clipboard-list"></i> Danh sách đơn hàng</a>
-                    <a href="{% url 'web:profile_addresses' %}" class="list-group-item list-group-item-action"><i class="fas fa-map-marker-alt"></i> Sổ địa chỉ</a>
-                    <a href="{% url 'web:logout' %}" class="list-group-item list-group-item-action text-danger"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-9 profile-content-area">
+{% block profile_content %}
             <div class="mb-3">
                 <a href="{% url 'web:profile_orders' %}" class="text-decoration-none text-muted">
                     <i class="fas fa-arrow-left"></i> Quay lại danh sách đơn hàng
@@ -44,31 +13,56 @@
             </div>
 
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="fw-bold text-uppercase m-0">Chi tiết đơn hàng #{{ order.id }}</h5>
-                        <small class="text-muted">Ngày đặt: {{ order.NgayDat|date:"d/m/Y H:i" }}</small>
-                    </div>
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h5 class="fw-bold text-uppercase m-0 mb-2">Chi tiết đơn hàng #{{ order.id }}</h5>
                     
-                                {% if "Đã giao" in order.trangThaiGH %}
-                                    <span class="badge bg-success order-status-badge"><i class="fas fa-check-circle"></i> {{ order.trangThaiGH }}</span>
-                                {% elif "Đã hủy" in order.trangThaiGH %}
-                                    <span class="badge bg-danger order-status-badge"><i class="fas fa-times-circle"></i> {{ order.trangThaiGH }}</span>
-                                {% elif "Đang giao" in order.trangThaiGH %}
-                                    <span class="badge bg-info text-dark order-status-badge"><i class="fas fa-truck"></i> {{ order.trangThaiGH }}</span>
-                                {% elif "Đã xác nhận" in order.trangThaiGH %}
-                                    <span class="badge bg-primary order-status-badge"><i class="fas fa-check"></i> {{ order.trangThaiGH }}</span>
-                                {% else %}
-                                    <span class="badge bg-warning text-dark order-status-badge"><i class="fas fa-clock"></i> {{ order.trangThaiGH }}</span>
-                                {% endif %}
+                    {% if order.trangThaiGH != 'Đã hủy' %}
+                    <div class="step-wizard">
+                        {% with order_status=order.trangThaiGH %}
+                        <div class="step-connector">
+                            <div class="step-connector-segment {% if order_status == 'Đã xác nhận' or order_status == 'Đang giao' or order_status == 'Đã giao' %}completed{% endif %}"></div>
+                            <div class="step-connector-segment {% if order_status == 'Đang giao' or order_status == 'Đã giao' %}completed{% endif %}"></div>
+                            <div class="step-connector-segment {% if order_status == 'Đã giao' %}completed{% endif %}"></div>
+                        </div>
+
+                        <div class="step-wizard-item {% if order_status == 'Chờ xử lý' %}current{% elif order_status == 'Đã xác nhận' or order_status == 'Đang giao' or order_status == 'Đã giao' %}completed{% endif %}">
+                            <div class="step-wizard-circle"><i class="fas fa-file-invoice"></i></div>
+                            <div class="step-wizard-title">Chờ xử lý</div>
+                        </div>
+
+                        <div class="step-wizard-item {% if order_status == 'Đã xác nhận' %}current{% elif order_status == 'Đang giao' or order_status == 'Đã giao' %}completed{% endif %}">
+                            <div class="step-wizard-circle"><i class="fas fa-box-open"></i></div>
+                            <div class="step-wizard-title">Đã xác nhận</div>
+                        </div>
+
+                        <div class="step-wizard-item {% if order_status == 'Đang giao' %}current{% elif order_status == 'Đã giao' %}completed{% endif %}">
+                            <div class="step-wizard-circle"><i class="fas fa-shipping-fast"></i></div>
+                            <div class="step-wizard-title">Đang giao hàng</div>
+                        </div>
+
+                        <div class="step-wizard-item {% if order_status == 'Đã giao' %}current{% endif %}">
+                            <div class="step-wizard-circle"><i class="fas fa-check-circle"></i></div>
+                            <div class="step-wizard-title">Đã giao</div>
+                        </div>
+                        {% endwith %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-danger text-center mt-3" role="alert">
+                        <h4 class="alert-heading"><i class="fas fa-times-circle me-2"></i>Đơn hàng đã bị hủy</h4>
+                        <p class="mb-0">Đơn hàng này đã bị hủy vào ngày {{ order.NgayCapNhat|date:"d/m/Y H:i" }}.</p>
+                        {% if order.lyDoHuy %}
+                        <p class="mb-0">Lý do: {{ order.lyDoHuy }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
                 
                 <div class="card-body p-4">
                     
-                    <div class="row mb-4">
+                    <div class="row mb-4 gx-4">
                         <div class="col-md-6">
-                            <h6 class="fw-bold text-primary">Địa chỉ nhận hàng</h6>
-                            <div class="bg-light p-3 rounded">
+                            <h6 class="fw-bold text-primary mb-3"><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ nhận hàng</h6>
+                            <div class="bg-light p-3 rounded border-start border-primary border-3">
                                 <p class="mb-1"><strong>{{ order.TaiKhoan.TenKhachHang }}</strong></p>
                                 <p class="mb-1 text-muted">{{ order.DiaChi.SDTLienHe }}</p>
                                 <p class="mb-0 text-muted small">
@@ -77,17 +71,18 @@
                             </div>
                         </div>
                         <div class="col-md-6 mt-3 mt-md-0">
-                            <h6 class="fw-bold text-primary">Phương thức thanh toán</h6>
+                            <h6 class="fw-bold text-primary mb-3">Thông tin đơn hàng</h6>
                             <div class="bg-light p-3 rounded h-100">
-                                <p class="mb-0">{{ order.ThanhToan.TenPTTT }}</p>
+                                <p class="mb-1"><strong>Phương thức thanh toán:</strong> {{ order.ThanhToan.TenPTTT }}</p>
+                                <p class="mb-0"><strong>Ngày đặt:</strong> {{ order.NgayDat|date:"d/m/Y H:i" }}</p>
                             </div>
                         </div>
                     </div>
 
                     <h6 class="fw-bold text-primary mb-3">Sản phẩm đã mua</h6>
                     <div class="table-responsive">
-                        <table class="table table-detail align-middle">
-                            <thead>
+                        <table class="table table-detail align-middle table-borderless">
+                            <thead class="bg-light">
                                 <tr>
                                     <th>Sản phẩm</th>
                                     <th class="text-end">Đơn giá</th>
@@ -102,7 +97,7 @@
                                         <div class="d-flex align-items-center">
                                             {% with first_img=item.SanPham.hinhanhs.first %}
                                                 {% if first_img %}
-                                                    <img src="{{ first_img.Anh.url }}" width="50" height="50" class="rounded border me-2" style="object-fit: contain;">
+                                                    <img src="{{ first_img.Anh.url }}" width="60" height="60" class="rounded border me-2" style="object-fit: cover;">
                                                 {% else %}
                                                     <img src="https://placehold.co/50" class="rounded border me-2">
                                                 {% endif %}
@@ -150,8 +145,8 @@
                                 {% endif %}
 
                                 <tr>
-                                    <td colspan="3" class="text-end border-0 fs-5 fw-bold">Tổng cộng:</td>
-                                    <td class="text-end border-0 fs-5 fw-bold text-danger">
+                                    <td colspan="3" class="text-end border-0 fs-4 fw-bold">Tổng cộng:</td>
+                                    <td class="text-end border-0 fs-4 fw-bold text-primary">
                                         {{ order.TongTien|format_price }}
                                     </td>
                                 </tr>
@@ -160,7 +155,4 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 {% endblock %}

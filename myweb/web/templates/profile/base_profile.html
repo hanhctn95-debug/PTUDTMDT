@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row">
+        
+        <div class="col-md-3 mb-4">
+            {% include "profile/includes/_profile_sidebar.html" %}
+        </div>
+
+        <div class="col-md-9 profile-content-area">
+            {% block profile_content %}
+            {% endblock %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

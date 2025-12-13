@@ -1,0 +1,277 @@
+/* CSS for profile pages */
+.profile-sidebar .list-group-item {
+    border: none; /* Remove all borders */
+    padding: 15px 20px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+    border-radius: 8px; /* Slightly more rounded corners */
+    transition: all 0.2s ease-in-out;
+}
+.profile-sidebar .list-group-item i {
+    width: 25px; 
+}
+
+/* Hover effect */
+.profile-sidebar .list-group-item:not(.active):hover {
+    background-color: #f0f2f5;
+    color: #0d6efd;
+    transform: translateX(4px); /* Add a subtle slide effect */
+}
+
+/* Active item - Orange color */
+.profile-sidebar .list-group-item.active {
+    background-color: #ff9800; 
+    color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Avatar */
+.avatar-circle {
+    width: 90px;
+    height: 90px;
+    background-color: #ff9800;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    border: 3px solid white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+.profile-card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+}
+
+/*
+=========================================
+NEW MEMBERSHIP PAGE STYLES
+=========================================
+*/
+
+.membership-page-container {
+    background-color: #f8f9fa; /* A very light grey background for the page */
+    border-radius: 12px;
+}
+
+/* Gold Gradient Card */
+.membership-overview-card.gold-gradient {
+    background: linear-gradient(135deg, #c29528 0%, #ffde7a 100%);
+}
+
+.membership-overview-card .small-caps {
+    font-variant: small-caps;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* Main Rank Icon */
+.rank-icon-main {
+    font-size: 80px;
+    color: white;
+}
+
+.rank-icon-glow {
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 25px rgba(255, 255, 255, 0.5);
+}
+
+.total-spending-amount {
+    color: white;
+}
+
+.alert-max-level {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white;
+}
+
+/* Rank Badges */
+.rank-badge {
+    padding: 0.5em 1em;
+    border-radius: 50px;
+    font-weight: bold;
+    color: #fff;
+    text-transform: uppercase;
+}
+.rank-badge-new { background-color: #6c757d; }
+.rank-badge-silver { background-color: #C0C0C0; color: #343a40;}
+.rank-badge-gold { background-color: #FFD700; color: #343a40;}
+.rank-badge-platinum { background-color: #dbe4f0; color: #343a40;}
+.rank-badge-diamond { 
+    background-image: linear-gradient(45deg, #84fab0 0%, #8fd3f4 100%);
+    color: #343a40;
+}
+
+/* Rank Tier Cards */
+.rank-tiers-section h4 {
+    color: #333;
+}
+
+.rank-tier-card {
+    border: 1px solid #e9ecef;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.rank-tier-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.12) !important;
+    border-color: #004d99;
+}
+
+.tier-icon-wrapper {
+    background-color: #f8f9fa;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border: 1px solid #eee;
+}
+
+/* Current Rank Highlight */
+.current-rank-card {
+    border-width: 2px;
+    border-color: #ff9800;
+    box-shadow: 0 0.5rem 1rem rgba(255, 152, 0, 0.2) !important;
+}
+
+.current-rank-marker {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #ff9800;
+}
+.small-caps{
+    text-transform: uppercase;
+    font-variant: small-caps;
+}
+
+/*
+=========================================
+ORDER HISTORY PAGE STYLES
+=========================================
+*/
+.order-history-table thead th {
+    font-weight: 600;
+    vertical-align: middle;
+}
+.order-history-table tbody tr {
+    border-bottom: 1px solid #f0f2f5;
+}
+.order-history-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.status-badge i {
+    font-size: 0.85rem;
+}
+
+.status-delivered { background-color: #d1e7dd; color: #0f5132; }
+.status-cancelled { background-color: #f8d7da; color: #842029; }
+.status-shipping { background-color: #cff4fc; color: #055160; }
+.status-confirmed { background-color: #dbe4f0; color: #2c3e50; }
+.status-pending { background-color: #fff3cd; color: #664d03; }
+
+.pagination .page-link {
+    color: #004d99;
+}
+.pagination .page-item.active .page-link {
+    background-color: #ff9800;
+    border-color: #ff9800;
+    color: white;
+}
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+}
+
+/* CSS riêng cho chi tiết đơn */
+.order-status-badge { font-size: 0.9rem; padding: 8px 15px; border-radius: 20px; }
+.table-detail th { background-color: #f8f9fa; color: #6c757d; font-weight: 600; }
+
+/* New Step Wizard CSS */
+.step-wizard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding: 0 10px; /* Add some padding to prevent icons from touching edges */
+}
+.step-wizard-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    z-index: 1;
+}
+.step-wizard-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #e9ecef; /* Light Gray for pending */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    color: #6c757d; /* Gray icon for pending */
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+.step-wizard-item.completed .step-wizard-circle {
+    background-color: #28a745; /* Green for completed */
+    color: white;
+}
+.step-wizard-item.current .step-wizard-circle {
+    background-color: #0d6efd; /* Blue for current */
+    color: white;
+    transform: scale(1.1); /* Slightly larger */
+    box-shadow: 0 0 0 5px rgba(13, 110, 253, 0.2);
+}
+.step-wizard-title {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+.step-wizard-item.completed .step-wizard-title,
+.step-wizard-item.current .step-wizard-title {
+    color: #343a40;
+    font-weight: bold;
+}
+
+/* Step Connector Lines */
+.step-connector {
+    position: absolute;
+    top: 29px; /* Half of circle height (60/2) - 1px for line thickness */
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    height: 2px;
+    padding: 0 40px; /* Adjust padding to match circle width */
+}
+.step-connector-segment {
+    flex: 1;
+    background-color: #e9ecef; /* Light Gray for pending */
+    transition: background-color 0.3s ease;
+}
+.step-connector-segment.completed {
+    background-color: #28a745; /* Green for completed */
+}

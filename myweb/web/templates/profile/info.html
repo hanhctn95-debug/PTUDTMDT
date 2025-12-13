@@ -1,146 +1,62 @@
-{% extends "base.html" %}
+{% extends "profile/base_profile.html" %}
 {% load static %}
 
-{% block content %}
-<style>
-    /* CSS Riêng cho trang Profile để giống mẫu */
-    .profile-sidebar .list-group-item {
-        border: none;
-        padding: 12px 20px;
-        font-weight: 500;
-        color: #333;
-        margin-bottom: 5px;
-        border-radius: 5px;
-        transition: all 0.2s;
-    }
-    .profile-sidebar .list-group-item i {
-        width: 25px; /* Cố định chiều rộng icon */
-    }
-    
-    /* Hiệu ứng hover */
-    .profile-sidebar .list-group-item:hover {
-        background-color: #e9ecef;
-        color: #0d6efd;
-    }
-
-    /* Mục đang chọn (Active) - Màu cam giống ảnh */
-    .profile-sidebar .list-group-item.active {
-        background-color: #ff9800; 
-        border-color: #ff9800;
-        color: white;
-    }
-
-    /* Avatar tròn */
-    .avatar-circle {
-        width: 80px;
-        height: 80px;
-        background-color: #ff9800;
-        color: white;
-        font-size: 32px;
-        font-weight: bold;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 10px;
-    }
-</style>
-
-<div class="container mt-4 mb-5">
-    <div class="row">
+{% block profile_content %}
+<div class="card profile-card">
+    <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+        <h5 class="fw-bold text-uppercase" style="color: #004d99;">Thông tin tài khoản</h5>
+    </div>
+    <div class="card-body p-4">
         
-        <div class="col-md-3 mb-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center pt-4 pb-3">
-                    <div class="avatar-circle">
-                        {{ user.TenKhachHang|slice:":1"|upper }}
-                    </div>
-                    <h6 class="fw-bold">Xin chào, {{ user.TenKhachHang }}</h6>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold">Họ và tên</label>
+                <input type="text" name="fullname" class="form-control" value="{{ user.TenKhachHang }}" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Email</label>
+                <input type="email" class="form-control bg-light" value="{{ user.Email }}" readonly>
+                <small class="text-muted">Email không thể thay đổi.</small>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Số điện thoại</label>
+                <input type="text" name="phone" class="form-control" value="{{ user.SDT|default:'' }}" placeholder="Nhập số điện thoại...">
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label class="form-label fw-bold">Ngày sinh</label>
+                    <input type="date" name="dob" class="form-control" value="{{ user.NgaySinh|date:'Y-m-d' }}">
                 </div>
-                
-                <div class="list-group list-group-flush p-3 profile-sidebar">
-                    <a href="{% url 'web:profile_info' %}" class="list-group-item list-group-item-action active">
-                        <i class="fas fa-user"></i> Thông tin tài khoản
-                    </a>
-                    
-                    <a href="{% url 'web:profile_membership' %}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-crown"></i> Chương trình thành viên
-                    </a>
 
-                    <a href="{% url 'web:profile_orders' %}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-clipboard-list"></i> Danh sách đơn hàng
-                    </a>
-
-                    <a href="{% url 'web:profile_addresses' %}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-map-marker-alt"></i> Sổ địa chỉ
-                    </a>
-
-                    <a href="{% url 'web:logout' %}" class="list-group-item list-group-item-action text-danger">
-                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                    </a>
+                <div class="col-md-6 mb-4">
+                    <label class="form-label fw-bold">Giới tính</label>
+                    <select name="gender" class="form-select">
+                        <option value="" {% if not user.GioiTinh %}selected{% endif %}>-- Chọn giới tính --</option>
+                        <option value="Nam" {% if user.GioiTinh == 'Nam' %}selected{% endif %}>Nam</option>
+                        <option value="Nữ" {% if user.GioiTinh == 'Nữ' %}selected{% endif %}>Nữ</option>
+                        <option value="Khác" {% if user.GioiTinh == 'Khác' %}selected{% endif %}>Khác</option>
+                    </select>
                 </div>
             </div>
-        </div>
 
-        <div class="col-md-9 profile-content-area">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                    <h5 class="fw-bold text-uppercase text-primary">Thông tin tài khoản</h5>
-                </div>
-                <div class="card-body p-4">
-                    
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
-
-                    <form method="POST">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Họ và tên</label>
-                            <input type="text" name="fullname" class="form-control" value="{{ user.TenKhachHang }}" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Email</label>
-                            <input type="email" class="form-control bg-light" value="{{ user.Email }}" readonly>
-                            <small class="text-muted">Email không thể thay đổi.</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Số điện thoại</label>
-                            <input type="text" name="phone" class="form-control" value="{{ user.SDT|default:'' }}" placeholder="Nhập số điện thoại...">
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Ngày sinh</label>
-                                <input type="date" name="dob" class="form-control" value="{{ user.NgaySinh|date:'Y-m-d' }}">                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">Giới tính</label>
-                                <select name="gender" class="form-select">
-                                    <option value="" {% if not user.GioiTinh %}selected{% endif %}>-- Chọn giới tính --</option>
-                                    <option value="Nam" {% if user.GioiTinh == 'Nam' %}selected{% endif %}>Nam</option>
-                                    <option value="Nữ" {% if user.GioiTinh == 'Nữ' %}selected{% endif %}>Nữ</option>
-                                    <option value="Khác" {% if user.GioiTinh == 'Khác' %}selected{% endif %}>Khác</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-pill">
-                                Cập nhật thông tin
-                            </button>
-                        </div>
-
-                    </form>
-                </div>
+            <div class="mt-3 text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i> Lưu thay đổi
+                </button>
             </div>
-        </div>
 
+        </form>
     </div>
 </div>
 {% endblock %}
