@@ -255,7 +255,7 @@
   justify-content: center;
   height: 220px; /* Tăng chiều cao */
   overflow: hidden;
-  padding: 15px; /* Tăng padding */
+  padding: 5px; /* Tăng padding */
   border-radius: 12px; /* Bo góc cho khung ảnh */
   background-color: #f0f0f0; /* Màu nền nhẹ hơn */
   margin-bottom: 15px; /* Tăng margin */

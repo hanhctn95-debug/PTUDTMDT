@@ -18,22 +18,41 @@
 <section class="container mb-5">
     <div class="row bg-white p-4 rounded shadow-sm">
         <div class="col-md-5">
-            <div class="main-image-box mb-3 border rounded overflow-hidden d-flex align-items-center justify-content-center" style="height: 400px;">
-                {% if images %}
-                    <img id="mainImage" src="{{ images.0.Anh.url }}" class="img-fluid" style="max-height: 100%;" alt="{{ product.TenSanPham }}">
-                {% else %}
-                    <img id="mainImage" src="https://placehold.co/400x400" class="img-fluid" alt="No Image">
-                {% endif %}
-            </div>
-            
-            <div class="d-flex gap-2 overflow-auto">
-                {% for img in images %}
-                <div class="thumb-box border rounded p-1" style="width: 70px; height: 70px; cursor: pointer;" 
-                     onclick="changeImage('{{ img.Anh.url }}')">
-                    <img src="{{ img.Anh.url }}" class="w-100 h-100" style="object-fit: contain;">
+            {% if images %}
+            <!-- Carousel Main Image -->
+            <div id="productImageCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+                <div class="carousel-inner bg-white border rounded">
+                    {% for img in images %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <div class="main-image-container">
+                            <img src="{{ img.Anh.url }}" class="d-block w-100" alt="{{ product.TenSanPham }} - ảnh {{ forloop.counter }}">
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+
+            <!-- Thumbnails -->
+            <div class="carousel-indicators-container d-flex justify-content-center gap-2 mt-2">
+                {% for img in images %}
+                <button type="button" data-bs-target="#productImageCarousel" data-bs-slide-to="{{ forloop.counter0 }}" class="thumbnail-btn {% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}" aria-label="Slide {{ forloop.counter }}">
+                    <img src="{{ img.Anh.url }}" class="img-fluid" alt="Thumbnail {{ forloop.counter }}">
+                </button>
                 {% endfor %}
             </div>
+            {% else %}
+            <div class="main-image-box mb-3 border rounded overflow-hidden d-flex align-items-center justify-content-center" style="height: 400px;">
+                <img src="https://placehold.co/400x400" class="img-fluid" alt="No Image">
+            </div>
+            {% endif %}
         </div>
 
         <div class="col-md-7 ps-md-5 mt-4 mt-md-0">
@@ -222,12 +241,57 @@
     </div>
 </section>
 
+<style>
+    .main-image-container {
+        aspect-ratio: 1 / 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .main-image-container img {
+        object-fit: contain;
+        max-width: 100%;
+        max-height: 100%;
+        height: auto;
+        width: auto;
+    }
+    .carousel-indicators-container {
+        padding: 0;
+        margin-top: 1rem;
+    }
+    .thumbnail-btn {
+        width: 70px;
+        height: 70px;
+        border: 2px solid transparent;
+        padding: 2px;
+        background-color: transparent;
+        opacity: 0.6;
+        transition: opacity 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    }
+    .thumbnail-btn.active {
+        border-color: #0d6efd; /* Bootstrap primary blue */
+        opacity: 1;
+        border-radius: .25rem;
+    }
+    .thumbnail-btn img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    /* Style for carousel controls */
+    .carousel-control-prev, .carousel-control-next {
+        width: 5%;
+    }
+    .carousel-control-prev-icon, .carousel-control-next-icon {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        padding: 1.1rem;
+        background-size: 50%;
+    }
+</style>
+
 <script>
     const maxStock = parseInt("{{ product.SoLuongTonKho|default:'0' }}");
-
-    function changeImage(src) {
-        document.getElementById('mainImage').src = src;
-    }
 
     function updateQty(change) {
         const input = document.getElementById('qtyInput');
@@ -251,6 +315,23 @@
                 document.getElementById('addToCartForm').submit();
             });
         }
+    }
+
+    // Carousel and thumbnail synchronization
+    const imageCarousel = document.getElementById('productImageCarousel');
+    if (imageCarousel) {
+        const thumbnailBtns = document.querySelectorAll('.thumbnail-btn');
+
+        imageCarousel.addEventListener('slide.bs.carousel', event => {
+            // Remove active class from all thumbnails
+            thumbnailBtns.forEach(btn => btn.classList.remove('active'));
+
+            // Add active class to the new slide's corresponding thumbnail
+            const activeThumbnail = document.querySelector(`.thumbnail-btn[data-bs-slide-to="${event.to}"]`);
+            if (activeThumbnail) {
+                activeThumbnail.classList.add('active');
+            }
+        });
     }
 </script>
 

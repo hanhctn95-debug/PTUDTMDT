@@ -9,7 +9,7 @@ env/
 # Django
 db.sqlite3
 staticfiles/
-media/
+#media/
 
 # Python
 __pycache__/
