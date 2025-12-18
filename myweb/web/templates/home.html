@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load query_params %}
 
 
 
@@ -44,7 +45,7 @@
     </section>
     {% endif %}
 
-    <section class="product-highlight-section container-fluid mt-4 mb-5">
+    <section class="product-highlight-section container-fluid mt-4 mb-5" id="product-list">
     
     <div class="row justify-content-center">
         
@@ -70,11 +71,9 @@
                 {% endfor %}
             </div>
             
-            {% if not query %}
-            <div class="text-center mt-5 mb-5">
-                <a href="#" class="btn btn-outline-primary px-4 py-2">Xem Tất Cả Sản Phẩm</a>
+            <div class="mt-5">
+                {% include "includes/pagination.html" with products=san_pham scroll_to="#product-list" %}
             </div>
-            {% endif %}
 
         </div> </div> </section>
 
