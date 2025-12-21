@@ -19,13 +19,22 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from web.views import analytics_view
+
+# Customize admin site title
+admin.site.site_header = "VPP Shop - Quản Lý Admin"
+admin.site.site_title = "VPP Shop Admin"
+admin.site.index_title = "Chào mừng đến Dashboard Quản Lý"
 
 urlpatterns = [
+    # Analytics URLs (MUST be before admin.site.urls!)
+    path('admin/analytics/', analytics_view.admin_analytics, name='admin_analytics'),
+    path('admin/export-pdf/<str:report_type>/', analytics_view.export_analytics_pdf, name='export_analytics_pdf'),
     path('admin/', admin.site.urls),
-    path('', include('web.urls')), # <== Đảm bảo trỏ đến ứng dụng 'web'
+    path('', include('web.urls')), # <== Include web app URLs
 ]
 
-# Cấu hình Media/Static cho môi trường phát triển (Nếu chưa có)
+# Cấu hình Media/Static cho môi trường phát triển
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     # The static() helper is for development only and works with STATIC_ROOT.

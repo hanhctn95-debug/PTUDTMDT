@@ -372,4 +372,24 @@ class DanhGia(models.Model):
     def __str__(self):
         return f"Đánh giá {self.Diem} sao của {self.TaiKhoan.TenKhachHang}"
 
+
+# =============================================================
+# 17. DUMMY MODEL FOR ANALYTICS DASHBOARD (ADMIN SIDEBAR)
+# =============================================================
+
+# [17] Bảng BaoCaoThongKe (Dummy - Không lưu dữ liệu, chỉ dùng để hiển thị trong admin)
+class BaoCaoThongKe(models.Model):
+    """
+    Dummy Model to display Analytics link in Django Admin Sidebar.
+    This model doesn't store any data; it's just a navigation tool.
+    """
+    class Meta:
+        verbose_name = 'Báo Cáo Thống Kê'
+        verbose_name_plural = 'Báo Cáo Thống Kê'
+        managed = False  # Django won't create a database table for this model
+        app_label = 'web'
+    
+    def __str__(self):
+        return "Báo Cáo Thống Kê"
+
 # Create your models here.

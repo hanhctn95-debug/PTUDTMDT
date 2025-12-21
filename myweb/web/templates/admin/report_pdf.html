@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>{{ title }}</title>
+    <style type="text/css">
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+        
+        body {
+            font-size: 11pt;
+            color: #333;
+            font-family: Helvetica, Arial;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #417690;
+            padding-bottom: 15px;
+        }
+        
+        .header h1 {
+            font-size: 18pt;
+            color: #417690;
+            margin: 0;
+        }
+        
+        .header h2 {
+            font-size: 14pt;
+            color: #333;
+            margin: 5px 0 0 0;
+        }
+        
+        .header-date {
+            font-size: 10pt;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .info-section {
+            margin-bottom: 20px;
+            margin-top: 15px;
+            font-size: 12pt;
+            color: #000;
+            font-weight: bold;
+            line-height: 1.6;
+        }
+        
+        .section-title {
+            font-size: 12pt;
+            font-weight: bold;
+            color: white;
+            background-color: #417690;
+            padding: 8px;
+            margin: 15px 0 10px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        table thead {
+            background-color: #417690;
+            color: white;
+        }
+        
+        table th {
+            border: 1px solid #417690;
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        
+        table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 10pt;
+        }
+        
+        table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .low-stock {
+            background-color: #fff3cd;
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            width: 100%;
+        }
+        
+        .signature-box {
+            width: 45%;
+            text-align: center;
+            padding: 20px;
+            display: inline-block;
+            margin-right: 5%;
+        }
+        
+        .signature-line {
+            margin-top: 50px;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+            font-size: 10pt;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ shop_name }}</h1>
+        <h2>{{ title }}</h2>
+        <div class="header-date">
+            Thoi gian: {{ start_date|date:"d/m/Y" }} - {{ end_date|date:"d/m/Y" }}<br/>
+            Ngay in: {{ report_date }}
+        </div>
+    </div>
+    
+    {% if report_type == "revenue" %}
+        <div class="info-section">
+            <p style="margin: 0; padding: 0;"><strong style="font-size: 12pt;">Bao cao Doanh Thu</strong></p>
+            <p style="margin: 5px 0 0 0; padding: 0;">Thong ke doanh thu tu cac don hang da giao</p>
+        </div>
+        <div class="section-title">Doanh Thu Hang Ngay</div>
+        {% if data %}
+            <table>
+                <tr style="background-color: #417690; color: white;">
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: left; font-weight: bold;">Ngay</th>
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: right; font-weight: bold;">Doanh Thu (VND)</th>
+                </tr>
+                {% for item in data %}
+                <tr>
+                    <td>{{ item.date|date:"d/m/Y" }}</td>
+                    <td class="text-right">{{ item.total_revenue|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Khong co du lieu</p>
+        {% endif %}
+    
+    {% elif report_type == "sales" %}
+        <div class="info-section">
+            <p style="margin: 0; padding: 0;"><strong style="font-size: 12pt;">Bao cao Doanh So</strong></p>
+            <p style="margin: 5px 0 0 0; padding: 0;">Thong ke so luong san pham ban ra hang ngay</p>
+        </div>
+        <div class="section-title">Doanh So Hang Ngay</div>
+        {% if data %}
+            <table>
+                <tr style="background-color: #417690; color: white;">
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: left; font-weight: bold;">Ngay</th>
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: right; font-weight: bold;">So Luong (San Pham)</th>
+                </tr>
+                {% for item in data %}
+                <tr>
+                    <td>{{ item.date|date:"d/m/Y" }}</td>
+                    <td class="text-right">{{ item.total_quantity }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Khong co du lieu</p>
+        {% endif %}
+    
+    {% elif report_type == "inventory" %}
+        <div class="info-section">
+            <p style="margin: 0; padding: 0;"><strong style="font-size: 12pt;">Bao cao Ton Kho</strong></p>
+            <p style="margin: 5px 0 0 0; padding: 0;">Danh sach san pham co ton kho duoi 15 san pham</p>
+        </div>
+        <div class="section-title">San Pham Ton Kho Thap</div>
+        {% if data %}
+            <table>
+                <tr style="background-color: #417690; color: white;">
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: left; font-weight: bold;">Ten San Pham</th>
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: left; font-weight: bold;">Danh Muc</th>
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: right; font-weight: bold;">Gia (VND)</th>
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: right; font-weight: bold;">Ton Kho</th>
+                </tr>
+                {% for product in data %}
+                <tr {% if product.SoLuongTonKho < 5 %}class="low-stock"{% endif %}>
+                    <td>{{ product.TenSanPham }}</td>
+                    <td>{{ product.DanhMuc__TenDanhMuc }}</td>
+                    <td class="text-right">{{ product.DonGia|floatformat:0 }}</td>
+                    <td class="text-right">{{ product.SoLuongTonKho }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Tat ca san pham deu co ton kho du</p>
+        {% endif %}
+    
+    {% elif report_type == "best_sellers" %}
+        <div class="info-section">
+            <p style="margin: 0; padding: 0;"><strong style="font-size: 12pt;">Bao cao San Pham Ban Chay</strong></p>
+            <p style="margin: 5px 0 0 0; padding: 0;">Top 10 san pham ban chay nhat</p>
+        </div>
+        <div class="section-title">San Pham Ban Chay Nhat</div>
+        {% if data %}
+            <table>
+                <tr style="background-color: #417690; color: white;">
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: center; font-weight: bold;">STT</th>
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: left; font-weight: bold;">Ten San Pham</th>
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: right; font-weight: bold;">Gia (VND)</th>
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: center; font-weight: bold;">So Luong Ban</th>
+                    <th style="background-color: #417690; color: white; padding: 8px; text-align: right; font-weight: bold;">Doanh Thu (VND)</th>
+                </tr>
+                {% for product in data %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td>{{ product.SanPham__TenSanPham }}</td>
+                    <td class="text-right">{{ product.SanPham__DonGia|floatformat:0 }}</td>
+                    <td class="text-center">{{ product.total_sold }}</td>
+                    <td class="text-right">{{ product.total_revenue|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Khong co du lieu</p>
+        {% endif %}
+    {% endif %}
+    
+    <div class="signature-section">
+        <div class="signature-box">
+            <div class="signature-line">Nguoi tao bao cao</div>
+        </div>
+        <div class="signature-box">
+            <div class="signature-line">Quan ly / Giam doc</div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>VPP Shop - He Thong Quan Ly Ban Hang | Copyright 2025</p>
+    </div>
+</body>
+</html>

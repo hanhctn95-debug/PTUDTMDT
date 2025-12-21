@@ -1,6 +1,6 @@
 from django.urls import path
 # Import file home_view.py từ thư mục views
-from .views import home_view, category_view, product_view, auth_view, profile_view, cart_view, checkout_view, api_view
+from .views import home_view, category_view, product_view, auth_view, profile_view, cart_view, checkout_view, api_view, analytics_view
 
 app_name = 'web'
 

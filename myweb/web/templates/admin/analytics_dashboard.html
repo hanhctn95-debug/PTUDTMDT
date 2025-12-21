@@ -1,0 +1,529 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% load price_filters %}
+
+{% block title %}Báo Cáo Thống Kê - Admin{% endblock %}
+
+{% block extrastyle %}
+<style>
+    /* Bootstrap & Charts.js */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+    }
+    
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .header-section {
+        border-bottom: 2px solid #417690;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .header-section h1 {
+        color: #417690;
+        margin: 0;
+    }
+    
+    .filter-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .filter-card .row {
+        align-items: flex-end;
+    }
+    
+    .filter-card label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+    
+    .filter-card input[type="date"] {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    .btn-filter {
+        background-color: #417690;
+        color: white;
+        border: none;
+        padding: 8px 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.3s;
+    }
+    
+    .btn-filter:hover {
+        background-color: #2d5266;
+    }
+    
+    .btn-export {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        text-decoration: none;
+        display: inline-block;
+        margin: 5px;
+        transition: background-color 0.3s;
+    }
+    
+    .btn-export:hover {
+        background-color: #218838;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .kpi-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .kpi-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .kpi-card.revenue {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .kpi-card.volume {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .kpi-card.orders {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .kpi-card h3 {
+        font-size: 12px;
+        text-transform: uppercase;
+        margin: 0 0 10px 0;
+        opacity: 0.9;
+        letter-spacing: 1px;
+    }
+    
+    .kpi-card .value {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 0;
+    }
+    
+    .nav-tabs {
+        border-bottom: 2px solid #dee2e6;
+        margin-bottom: 25px;
+    }
+    
+    .nav-tabs .nav-link {
+        color: #666;
+        border: none;
+        border-bottom: 3px solid transparent;
+        padding: 12px 20px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        color: #417690;
+        border-bottom-color: #417690;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #417690;
+        border-bottom-color: #417690;
+        background: none;
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 400px;
+        margin-bottom: 20px;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 6px;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 6px;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    table thead {
+        background-color: #417690;
+        color: white;
+    }
+    
+    table th {
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    table td {
+        padding: 12px;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    table tbody tr:hover {
+        background-color: #e9ecef;
+    }
+    
+    .low-stock {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    
+    .product-image {
+        max-width: 60px;
+        height: 60px;
+        border-radius: 4px;
+        object-fit: cover;
+    }
+    
+    .rank-badge {
+        display: inline-block;
+        background: #417690;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .export-buttons {
+        margin-top: 20px;
+        text-align: right;
+    }
+    
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+        font-size: 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="header-section">
+        <h1>📊 Báo Cáo Thống Kê Bán Hàng</h1>
+        <p style="margin: 10px 0 0 0; color: #666;">Dashboard quản lý doanh thu, doanh số, tồn kho và sản phẩm bán chạy</p>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="filter-card">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="start_date" class="form-label">Từ Ngày</label>
+                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}">
+            </div>
+            <div class="col-md-4">
+                <label for="end_date" class="form-label">Đến Ngày</label>
+                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn-filter" style="width: 100%;">🔍 Lọc Dữ Liệu</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- KPI Cards -->
+    <div class="kpi-cards">
+        <div class="kpi-card revenue">
+            <h3>💰 Doanh Thu</h3>
+            <p class="value">{{ total_revenue|format_price }}</p>
+        </div>
+        <div class="kpi-card volume">
+            <h3>📦 Doanh Số</h3>
+            <p class="value">{{ total_sales_volume }} Sản phẩm</p>
+        </div>
+        <div class="kpi-card orders">
+            <h3>🛒 Đơn Hàng</h3>
+            <p class="value">{{ total_orders }}</p>
+        </div>
+    </div>
+    
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-tab="revenue">Doanh Thu</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-tab="sales">Doanh Số</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-tab="inventory">Tồn Kho</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-tab="best_sellers">Bán Chạy</a>
+        </li>
+    </ul>
+    
+    <!-- Tab 1: Revenue -->
+    <div id="revenue" class="tab-content active">
+        <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+        </div>
+        <div class="export-buttons">
+            <a href="{% url 'export_analytics_pdf' 'revenue' %}?start_date={{ start_date }}&end_date={{ end_date }}" class="btn-export">📥 Xuất PDF</a>
+        </div>
+    </div>
+    
+    <!-- Tab 2: Sales Volume -->
+    <div id="sales" class="tab-content">
+        <div class="chart-container">
+            <canvas id="salesChart"></canvas>
+        </div>
+        <div class="export-buttons">
+            <a href="{% url 'export_analytics_pdf' 'sales' %}?start_date={{ start_date }}&end_date={{ end_date }}" class="btn-export">📥 Xuất PDF</a>
+        </div>
+    </div>
+    
+    <!-- Tab 3: Low Stock Inventory -->
+    <div id="inventory" class="tab-content">
+        <div class="table-container">
+            {% if low_stock_products %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ảnh</th>
+                            <th>Tên Sản Phẩm</th>
+                            <th>Danh Mục</th>
+                            <th>Giá</th>
+                            <th>Tồn Kho</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in low_stock_products %}
+                        <tr>
+                            <td>
+                                <span style="color: #999;">-</span>
+                            </td>
+                            <td>{{ product.TenSanPham }}</td>
+                            <td>{{ product.DanhMuc__TenDanhMuc }}</td>
+                            <td>{{ product.DonGia|format_price }}</td>
+                            <td class="{% if product.SoLuongTonKho < 5 %}low-stock{% endif %}">
+                                {{ product.SoLuongTonKho }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-data">
+                    ✓ Tất cả sản phẩm đều có tồn kho đầu đủ (≥ 15 sản phẩm)
+                </div>
+            {% endif %}
+        </div>
+        <div class="export-buttons">
+            <a href="{% url 'export_analytics_pdf' 'inventory' %}?start_date={{ start_date }}&end_date={{ end_date }}" class="btn-export">📥 Xuất PDF</a>
+        </div>
+    </div>
+    
+    <!-- Tab 4: Best Sellers -->
+    <div id="best_sellers" class="tab-content">
+        <div class="table-container">
+            {% if best_sellers %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Xếp Hạng</th>
+                            <th>Tên Sản Phẩm</th>
+                            <th>Danh Mục</th>
+                            <th>Giá Bán</th>
+                            <th>Số Lượng Bán</th>
+                            <th>Tổng Doanh Thu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in best_sellers %}
+                            {% if forloop.counter <= 10 %}
+                            <tr>
+                                <td><span class="rank-badge">#{{ forloop.counter }}</span></td>
+                                <td>{{ product.SanPham__TenSanPham }}</td>
+                                <td>{{ product.SanPham__DanhMuc__TenDanhMuc }}</td>
+                                <td>{{ product.SanPham__DonGia|format_price }}</td>
+                                <td>{{ product.total_sold }}</td>
+                                <td>{{ product.total_revenue|format_price }}</td>
+                            </tr>
+                            {% endif %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #999;">Chưa có dữ liệu</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-data">
+                    Chưa có dữ liệu bán hàng trong khoảng thời gian này
+                </div>
+            {% endif %}
+        </div>
+        <div class="export-buttons">
+            <a href="{% url 'export_analytics_pdf' 'best_sellers' %}?start_date={{ start_date }}&end_date={{ end_date }}" class="btn-export">📥 Xuất PDF</a>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching
+    const tabLinks = document.querySelectorAll('.nav-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class
+            tabLinks.forEach(l => l.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+            
+            // Redraw charts when tab is opened
+            if (tabId === 'revenue' && window.revenueChart) {
+                setTimeout(() => window.revenueChart.resize(), 100);
+            }
+            if (tabId === 'sales' && window.salesChart) {
+                setTimeout(() => window.salesChart.resize(), 100);
+            }
+        });
+    });
+    
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        const revenueData = JSON.parse('{{ revenue_chart_json|safe }}');
+        window.revenueChart = new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: revenueData.labels,
+                datasets: [{
+                    label: 'Doanh Thu (VNĐ)',
+                    data: revenueData.data,
+                    backgroundColor: 'rgba(240, 147, 251, 0.8)',
+                    borderColor: 'rgba(245, 87, 108, 1)',
+                    borderWidth: 2,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    title: { display: true, text: 'Doanh Thu Hàng Ngày' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return (value / 1000000).toFixed(1) + 'M';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Sales Volume Chart
+    const salesCtx = document.getElementById('salesChart');
+    if (salesCtx) {
+        const salesData = JSON.parse('{{ sales_chart_json|safe }}');
+        window.salesChart = new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: salesData.labels,
+                datasets: [{
+                    label: 'Doanh Số (Sản Phẩm)',
+                    data: salesData.data,
+                    borderColor: 'rgba(79, 172, 254, 1)',
+                    backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointBackgroundColor: 'rgba(79, 172, 254, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    title: { display: true, text: 'Doanh Số Bán Hàng Hàng Ngày' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

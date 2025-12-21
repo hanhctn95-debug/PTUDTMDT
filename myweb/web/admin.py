@@ -1,10 +1,12 @@
 from django.contrib import admin
 from django import forms
 from django.utils.html import format_html
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 from .models import (
     DanhMuc, LoaiThuocTinh, PhuongThucThanhToan, GiamGia, KhuyenMai,
     TaiKhoan, DiaChi, SanPham, HinhAnh, SanPham_ThuocTinh, SanPham_KhuyenMai,
-    GioHang, ChiTietGioHang, DonHang, ChiTietDonHang, DanhGia
+    GioHang, ChiTietGioHang, DonHang, ChiTietDonHang, DanhGia, BaoCaoThongKe
 )
 
 # =============================================================
@@ -116,3 +118,40 @@ class DanhGiaAdmin(admin.ModelAdmin):
     list_display = ('id', 'SanPham', 'TaiKhoan', 'Diem', 'NoiDung')
     list_filter = ('Diem',)
     search_fields = ('SanPham__TenSanPham', 'TaiKhoan__TenKhachHang')
+
+
+# =============================================================
+# 6. ANALYTICS DASHBOARD (DUMMY MODEL ADMIN)
+# =============================================================
+
+@admin.register(BaoCaoThongKe)
+class BaoCaoThongKeAdmin(admin.ModelAdmin):
+    """
+    Dummy Admin class to redirect to Analytics Dashboard.
+    This creates a link in the admin sidebar that points to our custom analytics view.
+    """
+    list_display = ('get_analytics_link',)
+    list_display_links = None  # Disable default admin links
+    
+    def has_add_permission(self, request):
+        """Hide 'Add' button"""
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        """Hide 'Delete' button"""
+        return False
+    
+    def changelist_view(self, request, extra_context=None):
+        """
+        Override changelist view to redirect to analytics dashboard
+        """
+        return HttpResponseRedirect(reverse('admin_analytics'))
+    
+    def get_analytics_link(self, obj):
+        """Display a link to open analytics dashboard"""
+        url = reverse('admin_analytics')
+        return format_html(
+            '<a href="{}" style="color: #417690; text-decoration: none; font-weight: bold;">📊 Mở Dashboard Thống Kê</a>',
+            url
+        )
+    get_analytics_link.short_description = 'Báo Cáo Thống Kê'
